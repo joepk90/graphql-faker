@@ -19,6 +19,7 @@ export function getProxyExecuteFn(url, headers, forwardHeaders) {
   return (args: ExecutionArgs) => {
     const { schema, document, contextValue, operationName } = args;
 
+    // the expressjs headers are being extracted from the request here:
     const request = contextValue as IncomingMessage;
     const proxyHeaders = Object.create(null);
     for (const name of forwardHeaders) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import { addMocksToSchema } from "@graphql-tools/mock"
 import * as bodyParser from 'body-parser';
 import * as chalk from 'chalk';
 import * as cors from 'cors';
@@ -11,15 +11,31 @@ import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import * as open from 'open';
 import * as path from 'path';
 
-import { parseCLI } from './cli';
+// import { parseCLI } from './cli'; // unused CLI Parsing logic
+import { getConfig } from './cliTest';
 import { buildWithFakeDefinitions, ValidationErrors } from './fake_definition';
 import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 import { getProxyExecuteFn } from './proxy';
 import { existsSync, getRemoteSchema, readSDL } from './utils';
 
+
+// custom resolver override
+// can this also be handled in the editor - I think the modifications are happening in the buildWithFakeDefinitions function
+const resolvers = {
+  Query: {
+    customerBilling: () => ({
+      billedPaymentDetails: {
+        paymentMethod: "PAYMENT_METHOD_DIRECT_DEBIT", // Overriding response (it must match the exact string defined in the real schema)
+      },
+    }),
+  },
+};
+
+
+// custom code end
 const log = console.log;
 
-const cliOptions = parseCLI();
+const cliOptions = getConfig();
 
 const { fileName, extendURL, headers, forwardHeaders } = cliOptions;
 
@@ -53,6 +69,8 @@ if (extendURL) {
       log(chalk.red(error.stack));
       process.exit(1);
     });
+
+
 } else {
   if (!userSDL) {
     userSDL = new Source(
@@ -93,7 +111,11 @@ function runServer(
     '/graphql',
     cors(corsOptions),
     graphqlHTTP(() => ({
-      schema,
+      // schema, 
+      schema: addMocksToSchema({
+        schema: schema,
+        resolvers: resolvers, // Pass the resolvers as override mocks
+      }),
       typeResolver: fakeTypeResolver,
       fieldResolver: fakeFieldResolver,
       customExecuteFn,
@@ -132,6 +154,7 @@ function runServer(
   });
 
   app.use('/editor', express.static(path.join(__dirname, 'editor')));
+
   app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
   app.use(
     '/voyager.worker.js',
