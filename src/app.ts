@@ -6,32 +6,17 @@ import * as cors from 'cors';
 import * as express from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import * as fs from 'fs';
-import { Source } from 'graphql';
+import { Source, GraphQLSchema } from 'graphql';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import * as open from 'open';
 import * as path from 'path';
-import { buildWithFakeDefinitions, ValidationErrors } from './fake_definition';
+import { buildWithFakeDefinitions } from './fake_definition';
 import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
-
-function prettyPrintValidationErrors(validationErrors: ValidationErrors) {
-  const { subErrors } = validationErrors;
-  console.log(
-    chalk.red(
-      subErrors.length > 1
-        ? `\nYour schema contains ${subErrors.length} validation errors: \n`
-        : `\nYour schema contains a validation error: \n`,
-    ),
-  );
-
-  for (const error of subErrors) {
-    const [message, ...otherLines] = error.toString().split('\n');
-    console.log([chalk.yellow(message), ...otherLines].join('\n') + '\n\n');
-  }
-}
 
 export const runServer = (
   options,
   userSDL: Source,
+  schema: GraphQLSchema,
   remoteSDL?: Source,
   customExecuteFn?,
 ) => {
@@ -41,18 +26,6 @@ export const runServer = (
     origin: options.corsOrigin,
   };
   const app = express();
-
-  let schema;
-  try {
-    schema = remoteSDL
-      ? buildWithFakeDefinitions(remoteSDL, userSDL)
-      : buildWithFakeDefinitions(userSDL);
-  } catch (error) {
-    if (error instanceof ValidationErrors) {
-      prettyPrintValidationErrors(error);
-      process.exit(1);
-    }
-  }
 
   app.options('/graphql', cors(corsOptions));
   app.use(

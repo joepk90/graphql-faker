@@ -15,6 +15,9 @@ import { IncomingMessage } from 'http';
 import { graphqlRequest } from './utils';
 
 export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
+  // return undefined if no url is passed
+  if (!url) return;
+
   //TODO: proxy extensions
   return async (args: ExecutionArgs) => {
     const { schema, document, contextValue, operationName } = args;
