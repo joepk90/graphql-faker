@@ -14,9 +14,5 @@ export const getConfig = () => {
     extendURL: process.env.EXTEND_URL,
   };
 
-  // const config = {
-  //   'cors-origin': "*",
-  // };
-
   return config;
 };
