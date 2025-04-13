@@ -10,6 +10,7 @@
     "noUnusedParameters": true,
     "outDir": "dist",
     "pretty": true,
+    "sourceMap": true,
     "moduleResolution": "node",
     "lib": ["es2017"]
   },
