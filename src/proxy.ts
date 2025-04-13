@@ -14,9 +14,9 @@ import { IncomingMessage } from 'http';
 
 import { graphqlRequest } from './utils';
 
-export function getProxyExecuteFn(url, headers, forwardHeaders) {
+export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
   //TODO: proxy extensions
-  return (args: ExecutionArgs) => {
+  return async (args: ExecutionArgs) => {
     const { schema, document, contextValue, operationName } = args;
 
     const request = contextValue as IncomingMessage;
@@ -34,15 +34,16 @@ export function getProxyExecuteFn(url, headers, forwardHeaders) {
       ? operations[operationName]
       : Object.values(operations)[0];
 
-    return graphqlRequest(
+    const response = await graphqlRequest(
       url,
       { ...headers, ...proxyHeaders },
       print(operationAST),
       args.variableValues,
       operationName,
-    ).then((result) => proxyResponse(result, args));
+    );
+    return await proxyResponse(response, args);
   };
-}
+};
 
 function proxyResponse(response, args) {
   const rootValue = response.data || {};

@@ -20,7 +20,7 @@ let userSDL = existsSync(fileName) && readSDL(fileName);
 if (extendURL) {
   // run in proxy mode
   getRemoteSchema(extendURL, headers)
-    .then((schema) => {
+    .then(async (schema) => {
       const remoteSDL = new Source(
         printSchema(schema),
         `Introspection from "${extendURL}"`,
@@ -38,7 +38,11 @@ if (extendURL) {
         userSDL = new Source(body, fileName);
       }
 
-      const executeFn = getProxyExecuteFn(extendURL, headers, forwardHeaders);
+      const executeFn = await getProxyExecuteFn(
+        extendURL,
+        headers,
+        forwardHeaders,
+      );
       runServer(options, userSDL, remoteSDL, executeFn);
     })
     .catch((error) => {
