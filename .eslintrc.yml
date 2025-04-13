@@ -3,16 +3,18 @@ parserOptions:
 env:
   es2022: true
   browser: true
-plugins: ['simple-import-sort', 'react', 'react-hooks']
+plugins: ['simple-import-sort', 'react', 'react-hooks', 'prettier']
 settings:
   react:
     version: detect
 extends:
+  - "prettier"
   - 'eslint:recommended'
   - 'plugin:import/recommended'
   - 'plugin:react/recommended'
   - 'plugin:react/jsx-runtime'
   - 'plugin:react-hooks/recommended'
+
 rules:
   'simple-import-sort/imports': error
   'simple-import-sort/exports': error
