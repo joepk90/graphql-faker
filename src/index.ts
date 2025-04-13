@@ -16,12 +16,13 @@ import { buildWithFakeDefinitions, ValidationErrors } from './fake_definition';
 import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 import { getProxyExecuteFn } from './proxy';
 import { existsSync, getRemoteSchema, readSDL } from './utils';
-
+import { getConfig } from './config';
 const log = console.log;
 
-const cliOptions = parseCLI();
+// const cliOptions = parseCLI();
+const options = getConfig();
 
-const { fileName, extendURL, headers, forwardHeaders } = cliOptions;
+const { fileName, extendURL, headers, forwardHeaders } = options;
 
 let userSDL = existsSync(fileName) && readSDL(fileName);
 
