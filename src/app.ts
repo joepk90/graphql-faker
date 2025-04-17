@@ -1,64 +1,38 @@
 #!/usr/bin/env node
 
+import * as fs from 'fs';
+import * as open from 'open';
+import * as path from 'path';
 import * as bodyParser from 'body-parser';
 import * as chalk from 'chalk';
 import * as cors from 'cors';
 import * as express from 'express';
 import { graphqlHTTP } from 'express-graphql';
-import * as fs from 'fs';
-import { Source } from 'graphql';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
-import * as open from 'open';
-import * as path from 'path';
-import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 
-import { getProxyExecuteFn } from './proxy';
 import {
   prepareRemoteSchema,
   prepareRemoteSDL,
   mergeUserSDL,
   getSchema,
+  getGraphqlHTTPOptions,
+  getCorsOptions,
 } from './utils';
 
 export const runServer = async (options) => {
-  let remoteSDL = null;
-  let remoteSchema = null;
+  const { fileName, extendURL, headers, port, openEditor } = options;
 
-  const { fileName, extendURL, headers, forwardHeaders } = options;
-
-  if (extendURL) {
-    remoteSchema = await prepareRemoteSchema(extendURL, headers);
-    remoteSDL = prepareRemoteSDL(remoteSchema, extendURL);
-  }
-
+  const remoteSchema = await prepareRemoteSchema(extendURL, headers);
+  const remoteSDL = prepareRemoteSDL(remoteSchema, extendURL);
   const userSDL = mergeUserSDL(fileName, remoteSchema);
   const schema = await getSchema(userSDL, remoteSDL);
 
-  const customExecuteFn = await getProxyExecuteFn(
-    extendURL,
-    headers,
-    forwardHeaders,
-  );
-
-  const { port, openEditor } = options;
-  const corsOptions = {
-    credentials: true,
-    origin: options.corsOrigin,
-  };
+  const corsOptions = getCorsOptions(options);
+  const graphqlHTTPOptions = await getGraphqlHTTPOptions(options, schema);
   const app = express();
 
   app.options('/graphql', cors(corsOptions));
-  app.use(
-    '/graphql',
-    cors(corsOptions),
-    graphqlHTTP(() => ({
-      schema,
-      typeResolver: fakeTypeResolver,
-      fieldResolver: fakeFieldResolver,
-      customExecuteFn,
-      graphiql: { headerEditorEnabled: true },
-    })),
-  );
+  app.use('/graphql', cors(corsOptions), graphqlHTTP(graphqlHTTPOptions));
 
   app.get('/user-sdl', (_, res) => {
     res.status(200).json({
@@ -72,7 +46,6 @@ export const runServer = async (options) => {
     try {
       const fileName = userSDL.name;
       fs.writeFileSync(fileName, req.body);
-      userSDL = new Source(req.body, fileName);
 
       const date = new Date().toLocaleString();
       console.log(

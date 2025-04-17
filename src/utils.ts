@@ -10,8 +10,10 @@ import {
 } from 'graphql';
 import * as fetch from 'node-fetch';
 import { Headers } from 'node-fetch';
-
+import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 import { buildWithFakeDefinitions, ValidationErrors } from './fake_definition';
+import { getProxyExecuteFn } from './proxy';
+import { Options } from 'express-graphql';
 
 export function existsSync(filePath: string): boolean {
   try {
@@ -102,6 +104,9 @@ export function prettyPrintValidationErrors(
 }
 
 export const prepareRemoteSchema = async (extendURL, headers) => {
+  if (!extendURL) {
+    return;
+  }
   try {
     return await getRemoteSchema(extendURL, headers);
   } catch (error) {
@@ -110,8 +115,15 @@ export const prepareRemoteSchema = async (extendURL, headers) => {
   }
 };
 
-export const prepareRemoteSDL = (schema, extendURL) => {
-  return new Source(printSchema(schema), `Introspection from "${extendURL}"`);
+export const prepareRemoteSDL = (remoteSchema, extendURL) => {
+  if (!remoteSchema) {
+    return;
+  }
+
+  return new Source(
+    printSchema(remoteSchema),
+    `Introspection from "${extendURL}"`,
+  );
 };
 
 export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
@@ -143,4 +155,32 @@ export const mergeUserSDL = (fileName, remoteSchema) => {
     userSDL = getDynamicUserSDLTest(fileName, remoteSchema);
   }
   return userSDL;
+};
+
+export const getGraphqlHTTPOptions = async (
+  options,
+  schema: GraphQLSchema,
+): Promise<Options> => {
+  const { extendURL, headers, forwardHeaders } = options;
+
+  const customExecuteFn = await getProxyExecuteFn(
+    extendURL,
+    headers,
+    forwardHeaders,
+  );
+
+  return {
+    schema,
+    typeResolver: fakeTypeResolver,
+    fieldResolver: fakeFieldResolver,
+    customExecuteFn,
+    graphiql: { headerEditorEnabled: true },
+  };
+};
+
+export const getCorsOptions = (options) => {
+  return {
+    credentials: true,
+    origin: options?.corsOrigin,
+  };
 };
