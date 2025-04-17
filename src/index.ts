@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { getConfig } from './config';
-import { runServer } from './app';
+import { getConfig } from 'src/config';
+import { runServer } from 'src/app';
 
 (async () => {
   const options = getConfig();

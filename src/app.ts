@@ -17,7 +17,7 @@ import {
   getSchema,
   getGraphqlHTTPOptions,
   getCorsOptions,
-} from './utils';
+} from 'src/utils';
 
 export const runServer = async (options) => {
   const { fileName, extendURL, headers, port, openEditor } = options;

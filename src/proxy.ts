@@ -12,7 +12,7 @@ import {
 } from 'graphql';
 import { IncomingMessage } from 'http';
 
-import { graphqlRequest } from './utils';
+import { graphqlRequest } from 'src/utils';
 
 export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
   // return undefined if no url is passed

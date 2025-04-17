@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
+import * as fetch from 'node-fetch';
+import { Headers } from 'node-fetch';
 import {
   buildClientSchema,
   getIntrospectionQuery,
@@ -8,12 +10,13 @@ import {
   Source,
   printSchema,
 } from 'graphql';
-import * as fetch from 'node-fetch';
-import { Headers } from 'node-fetch';
-import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
-import { buildWithFakeDefinitions, ValidationErrors } from './fake_definition';
-import { getProxyExecuteFn } from './proxy';
 import { Options } from 'express-graphql';
+import { fakeFieldResolver, fakeTypeResolver } from 'src/fake_schema';
+import {
+  buildWithFakeDefinitions,
+  ValidationErrors,
+} from 'src/fake_definition';
+import { getProxyExecuteFn } from 'src/proxy';
 
 export function existsSync(filePath: string): boolean {
   try {
