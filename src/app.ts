@@ -11,10 +11,10 @@ import { graphqlHTTP } from 'express-graphql';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 
 import {
-  prepareRemoteSchema,
-  prepareRemoteSDL,
   mergeUserSDL,
   getSchema,
+  prepareRemoteSchema,
+  prepareRemoteSDL,
   getGraphqlHTTPOptions,
   getCorsOptions,
 } from 'src/utils';
