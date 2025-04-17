@@ -6,20 +6,47 @@ import * as cors from 'cors';
 import * as express from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import * as fs from 'fs';
-import { Source, GraphQLSchema } from 'graphql';
+import { Source } from 'graphql';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 import * as open from 'open';
 import * as path from 'path';
-import { buildWithFakeDefinitions } from './fake_definition';
 import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 
-export const runServer = (
-  options,
-  userSDL: Source,
-  schema: GraphQLSchema,
-  remoteSDL?: Source,
-  customExecuteFn?,
-) => {
+import { getProxyExecuteFn } from './proxy';
+import {
+  existsSync,
+  readSDL,
+  prepareRemoteSchema,
+  prepareRemoteSDL,
+  getDynamicUserSDLTest,
+  getSchema,
+} from './utils';
+
+export const runServer = async (options) => {
+  let remoteSDL = null;
+  let remoteSchema = null;
+
+  const { fileName, extendURL, headers, forwardHeaders } = options;
+
+  let userSDL = existsSync(fileName) && readSDL(fileName);
+
+  if (extendURL) {
+    remoteSchema = await prepareRemoteSchema(extendURL, headers);
+    remoteSDL = prepareRemoteSDL(remoteSchema, extendURL);
+  }
+
+  if (!userSDL) {
+    userSDL = getDynamicUserSDLTest(fileName, remoteSchema);
+  }
+
+  const schema = await getSchema(userSDL, remoteSDL);
+
+  const customExecuteFn = await getProxyExecuteFn(
+    extendURL,
+    headers,
+    forwardHeaders,
+  );
+
   const { port, openEditor } = options;
   const corsOptions = {
     credentials: true,
@@ -53,9 +80,6 @@ export const runServer = (
       const fileName = userSDL.name;
       fs.writeFileSync(fileName, req.body);
       userSDL = new Source(req.body, fileName);
-      schema = remoteSDL
-        ? buildWithFakeDefinitions(remoteSDL, userSDL)
-        : buildWithFakeDefinitions(userSDL);
 
       const date = new Date().toLocaleString();
       console.log(
