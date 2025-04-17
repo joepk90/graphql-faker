@@ -134,3 +134,13 @@ export const getDynamicUserSDLTest = (fileName, remoteSchema) => {
 
   return prepareDefaultExtendedSDL(fileName, remoteSchema);
 };
+
+// WARNING - if the utils file is moved it may break the fileName path. the fileName relates to the (sibling) .graphql files
+// TOOD - review function - what does this actually do? Does it actually merge the user SDl? I named it this
+export const mergeUserSDL = (fileName, remoteSchema) => {
+  let userSDL = existsSync(fileName) && readSDL(fileName);
+  if (!userSDL) {
+    userSDL = getDynamicUserSDLTest(fileName, remoteSchema);
+  }
+  return userSDL;
+};

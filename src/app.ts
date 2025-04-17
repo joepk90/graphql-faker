@@ -14,11 +14,9 @@ import { fakeFieldResolver, fakeTypeResolver } from './fake_schema';
 
 import { getProxyExecuteFn } from './proxy';
 import {
-  existsSync,
-  readSDL,
   prepareRemoteSchema,
   prepareRemoteSDL,
-  getDynamicUserSDLTest,
+  mergeUserSDL,
   getSchema,
 } from './utils';
 
@@ -28,17 +26,12 @@ export const runServer = async (options) => {
 
   const { fileName, extendURL, headers, forwardHeaders } = options;
 
-  let userSDL = existsSync(fileName) && readSDL(fileName);
-
   if (extendURL) {
     remoteSchema = await prepareRemoteSchema(extendURL, headers);
     remoteSDL = prepareRemoteSDL(remoteSchema, extendURL);
   }
 
-  if (!userSDL) {
-    userSDL = getDynamicUserSDLTest(fileName, remoteSchema);
-  }
-
+  const userSDL = mergeUserSDL(fileName, remoteSchema);
   const schema = await getSchema(userSDL, remoteSDL);
 
   const customExecuteFn = await getProxyExecuteFn(
