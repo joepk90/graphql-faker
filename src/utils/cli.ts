@@ -3,6 +3,12 @@ import { parseArgs } from 'node:util';
 
 import * as chalk from 'chalk';
 
+/**
+ * Most (potentially all) logic in this file is not currently in use in favour of the config.ts setup
+ *
+ * TODO - review file - move Options interface to config.ts file.
+ */
+
 interface Options {
   fileName: string;
   port: number;
