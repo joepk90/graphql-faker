@@ -12,8 +12,13 @@
     "pretty": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    "lib": ["es2017"]
+    "lib": ["es2017"],
+    "baseUrl": ".",         
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
   "compileOnSave": false,
-  "exclude": ["src/editor", "node_modules", ".tmp", "dist", "lib"]
+  "exclude": ["src/editor", "node_modules", ".tmp", "dist", "lib"],
+  "include": ["./src"]
 }
