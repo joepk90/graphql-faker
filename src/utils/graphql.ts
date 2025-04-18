@@ -6,7 +6,8 @@ import {
   buildClientSchema,
 } from 'graphql';
 import { Options } from 'express-graphql';
-import { fakeFieldResolver, fakeTypeResolver } from 'src/fake_schema';
+// TODO - fake_schema kept seperate, it should potentially be moved out of the utils folder
+import { fakeFieldResolver, fakeTypeResolver } from 'src/utils/fake_schema';
 import { getProxyExecuteFn } from 'src/utils';
 
 export function graphqlRequest(

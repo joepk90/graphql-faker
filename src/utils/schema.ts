@@ -10,10 +10,11 @@ import {
   getRemoteSchema,
 } from 'src/utils';
 
+// TODO - fake_definition kept seperate, it should potentially be moved out of the utils folder
 import {
   buildWithFakeDefinitions,
   ValidationErrors,
-} from 'src/fake_definition';
+} from 'src/utils/fake_definition';
 
 const defaultSchemaFileName = 'default-schema.graphql';
 const extendedSchemaFileName = 'default-extend.graphql';

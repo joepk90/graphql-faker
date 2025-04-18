@@ -1,6 +1,11 @@
 import { allFakers, faker } from '@faker-js/faker';
 import * as moment from 'moment';
 
+/**
+ * Faker Helper Functions
+ * Uses to generate fake the fake schema
+ */
+
 export function getRandomInt(min: number, max: number) {
   return faker.number.int({ min, max });
 }

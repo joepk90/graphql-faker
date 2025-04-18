@@ -20,7 +20,7 @@ import {
   getRandomInt,
   getRandomItem,
   stdScalarFakers,
-} from 'src/fake';
+} from 'src/utils/fake';
 
 interface FakeArgs {
   type: string;
