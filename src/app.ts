@@ -1,76 +1,52 @@
 #!/usr/bin/env node
 
-import * as fs from 'fs';
 import * as open from 'open';
-import * as path from 'path';
 import * as bodyParser from 'body-parser';
 import * as chalk from 'chalk';
-import * as cors from 'cors';
 import * as express from 'express';
-import { graphqlHTTP } from 'express-graphql';
-import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
 
 import {
   mergeUserSDL,
-  getSchema,
   prepareRemoteSchema,
   prepareRemoteSDL,
-  getGraphqlHTTPOptions,
-  getCorsOptions,
+  editorDir,
 } from 'src/utils';
+import {
+  getGraphqlMiddleware,
+  getCorsMiddleware,
+  schemaHandlerPost,
+  schemaHandlerGet,
+  voyagerWorkerMiddleware,
+  voyagerMiddleware,
+} from 'src/handlers';
 
 export const runServer = async (options) => {
-  const { fileName, extendURL, headers, port, openEditor } = options;
+  const { extendURL, headers, fileName, port, openEditor } = options;
 
   const remoteSchema = await prepareRemoteSchema(extendURL, headers);
   const remoteSDL = prepareRemoteSDL(remoteSchema, extendURL);
   const userSDL = mergeUserSDL(fileName, remoteSchema);
-  const schema = await getSchema(userSDL, remoteSDL);
 
-  const corsOptions = getCorsOptions(options);
-  const graphqlHTTPOptions = await getGraphqlHTTPOptions(options, schema);
   const app = express();
 
-  app.options('/graphql', cors(corsOptions));
-  app.use('/graphql', cors(corsOptions), graphqlHTTP(graphqlHTTPOptions));
+  // graphql
+  const graphqlMiddlewareArgs = { options, userSDL, remoteSDL };
+  const graphqlMiddleware = await getGraphqlMiddleware(graphqlMiddlewareArgs);
+  const corsMiddleware = getCorsMiddleware(options);
+  app.options('/graphql', corsMiddleware);
+  app.use('/graphql', corsMiddleware, graphqlMiddleware);
 
-  app.get('/user-sdl', (_, res) => {
-    res.status(200).json({
-      userSDL: userSDL.body,
-      remoteSDL: remoteSDL?.body,
-    });
-  });
-
+  // user-sdl (schema)
+  app.get('/user-sdl', schemaHandlerGet(userSDL, remoteSDL));
   app.use('/user-sdl', bodyParser.text({ limit: '8mb' }));
-  app.post('/user-sdl', (req, res) => {
-    try {
-      const fileName = userSDL.name;
-      fs.writeFileSync(fileName, req.body);
+  app.post('/user-sdl', schemaHandlerPost(userSDL));
 
-      const date = new Date().toLocaleString();
-      console.log(
-        `${chalk.green('✚')} schema saved to ${chalk.magenta(
-          fileName,
-        )} on ${date}`,
-      );
+  // editor
+  app.use('/editor', express.static(editorDir));
 
-      res.status(200).send('ok');
-    } catch (err) {
-      res.status(500).send(err.message);
-    }
-  });
-
-  app.use('/editor', express.static(path.join(__dirname, 'editor')));
-  app.use('/voyager', voyagerMiddleware({ endpointUrl: '/graphql' }));
-  app.use(
-    '/voyager.worker.js',
-    express.static(
-      path.join(
-        __dirname,
-        '../node_modules/graphql-voyager/dist/voyager.worker.js',
-      ),
-    ),
-  );
+  // voyager
+  app.use('/voyager', voyagerMiddleware());
+  app.use('/voyager.worker.js', voyagerWorkerMiddleware());
 
   const server = app.listen(port);
 
