@@ -39,6 +39,8 @@ export const runServer = async (options) => {
   app.use('/graphql', corsMiddleware, graphqlMiddleware);
 
   // user-sdl (schema)
+  // i think user sdl represent a custom schema that is being saved to a
+  // schema_extension.faker.graphql file
   app.get('/user-sdl', schemaHandlerGet(userSDL, remoteSDL));
   app.use('/user-sdl', bodyParser.text({ limit: '8mb' }));
   app.post('/user-sdl', schemaHandlerPost(userSDL));

@@ -10,7 +10,9 @@ import { Voyager } from 'graphql-voyager';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { buildWithFakeDefinitions } from '../fake_definition';
+// if editor is extracted to a separate package, surely the schema should be requested
+// from the server, rather than building it here
+import { buildWithFakeDefinitions } from '../utils/fake_definition';
 import GraphQLEditor from './GraphQLEditor/GraphQLEditor';
 import { ConsoleIcon, EditIcon, GithubIcon, VoyagerIcon } from './icons';
 
