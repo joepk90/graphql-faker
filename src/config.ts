@@ -6,7 +6,7 @@ export const getConfig = () => {
   const config = {
     fileName: './schema_extension.faker.graphql',
     port: '9002',
-    open: false,
+    openEditor: false,
     headers: {}, // Example default header
     forwardHeaders: ['user-agent', 'authorization'], // Example default forwarded headers
     cors: false,

@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import * as open from 'open';
 import * as bodyParser from 'body-parser';
-import * as chalk from 'chalk';
 import * as express from 'express';
 
 import {
@@ -10,7 +8,11 @@ import {
   prepareRemoteSchema,
   prepareRemoteSDL,
   editorDir,
+  shutdown,
+  logServerStartup,
+  openEditorInBrowser,
 } from 'src/utils';
+
 import {
   getGraphqlMiddleware,
   getCorsMiddleware,
@@ -48,26 +50,12 @@ export const runServer = async (options) => {
   app.use('/voyager', voyagerMiddleware());
   app.use('/voyager.worker.js', voyagerWorkerMiddleware());
 
+  // app
   const server = app.listen(port);
+  logServerStartup(port);
+  openEditorInBrowser(openEditor, port);
 
-  const shutdown = () => {
-    server.close();
-    process.exit(0);
-  };
-
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
-
-  console.log(`\n${chalk.green('✔')} Your GraphQL Fake API is ready to use 🚀
-  Here are your links:
-
-  ${chalk.blue('❯')} Interactive Editor: http://localhost:${port}/editor
-  ${chalk.blue('❯')} GraphQL API:        http://localhost:${port}/graphql
-  ${chalk.blue('❯')} GraphQL Voyager:    http://localhost:${port}/voyager
-
-  `);
-
-  if (openEditor) {
-    setTimeout(() => open(`http://localhost:${port}/editor`), 500);
-  }
+  // shutdown
+  process.on('SIGINT', () => shutdown(server));
+  process.on('SIGTERM', () => shutdown(server));
 };
