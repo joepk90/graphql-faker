@@ -5,7 +5,7 @@ import * as chalk from 'chalk';
 import { Source, GraphQLSchema, printSchema } from 'graphql';
 import {
   existsSync,
-  resolveFromRoot,
+  schemaDir,
   prettyPrintValidationErrors,
   getRemoteSchema,
 } from 'src/utils';
@@ -14,8 +14,6 @@ import {
   buildWithFakeDefinitions,
   ValidationErrors,
 } from 'src/fake_definition';
-
-const schemaDir = resolveFromRoot('src', 'schemas');
 
 const defaultSchemaFileName = 'default-schema.graphql';
 const extendedSchemaFileName = 'default-extend.graphql';

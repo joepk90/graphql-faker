@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // TODO could replace with: pkg-dir, app-root-path, find-package-json?
-const projectRoot = path.resolve(__dirname, '../../');
+export const projectRoot = path.resolve(__dirname, '../../');
 
 export const resolveFromRoot = (...segments: string[]) => {
   return path.join(projectRoot, ...segments);

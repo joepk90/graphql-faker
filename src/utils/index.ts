@@ -1,4 +1,5 @@
-export * from './path';
+export * from './fs';
+export * from './paths';
 export * from './logs';
 export * from './proxy';
 export * from './graphql';
