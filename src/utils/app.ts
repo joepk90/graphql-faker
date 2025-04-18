@@ -17,7 +17,7 @@ export const logServerStartup = (port: string) => {
     `);
 };
 
-export const openEditorInBrowser = (openEditor: boolean, port: string) => {
+export const openEditorInBrowser = (openEditor: boolean, port: number) => {
   if (openEditor) {
     setTimeout(() => open(`http://localhost:${port}/editor`), 500);
   }
