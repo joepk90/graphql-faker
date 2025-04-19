@@ -57,10 +57,12 @@ export const getGraphqlHTTPOptions = async (
   };
 };
 
-export const getCorsOptions = (options) => {
+export const getCorsOptions = (_options) => {
+  const allowedHosts = process.env.ALLOWED_HOSTS || '';
   return {
     credentials: true,
-    origin: options?.corsOrigin,
+    // origin: options?.corsOrigin,
+    origin: allowedHosts,
   };
 };
 
