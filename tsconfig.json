@@ -8,7 +8,6 @@
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist",
     "pretty": true,
     "sourceMap": true,
     "moduleResolution": "node",
@@ -19,6 +18,6 @@
     }
   },
   "compileOnSave": false,
-  "exclude": ["src/editor", "node_modules", ".tmp", "dist", "lib"],
+  "exclude": ["src/editor", "node_modules", ".tmp", "lib"],
   "include": ["./src"]
 }
