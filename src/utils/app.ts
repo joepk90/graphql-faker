@@ -33,7 +33,6 @@ export const logServerStartup = () => {
   console.log(`\n${chalk.green('✔')} Your GraphQL Fake API is ready to use 🚀
     Here are your links:
   
-    ${chalk.blue('❯')} Interactive Editor: http://localhost:${port}/editor
     ${chalk.blue('❯')} GraphQL API:        http://localhost:${port}/graphql
     ${chalk.blue('❯')} GraphQL Voyager:    http://localhost:${port}/voyager
   
