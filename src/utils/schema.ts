@@ -8,6 +8,8 @@ import {
   schemaDir,
   prettyPrintValidationErrors,
   getRemoteSchema,
+  getSchemaFileName,
+  getSchemaExtendURL,
 } from 'src/utils';
 
 // TODO - fake_definition kept seperate, it should potentially be moved out of the utils folder
@@ -21,16 +23,24 @@ const extendedSchemaFileName = 'default-extend.graphql';
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
+const getUserSDLAndConvertToSource = () => {
+  const fileName = getSchemaFileName();
+  return existsSync(fileName) && readSDL(fileName);
+};
+
 export const getUserSDL = (fileName) =>
   fs.readFileSync(path.join(schemaDir, fileName), 'utf-8');
 
 export const readSDL = (filepath: string): Source =>
   new Source(fs.readFileSync(filepath, 'utf-8'), filepath);
 
-export const prepareDefaultSDL = (fileName) =>
-  new Source(getUserSDL(defaultSchemaFileName), fileName);
+export const prepareDefaultSDL = () => {
+  const fileName = getSchemaFileName();
+  return new Source(getUserSDL(defaultSchemaFileName), fileName);
+};
 
-export const prepareDefaultExtendedSDL = (fileName, schema) => {
+export const prepareDefaultExtendedSDL = (schema) => {
+  const fileName = getSchemaFileName();
   let body = getUserSDL(extendedSchemaFileName);
 
   const rootTypeName = schema.getQueryType().name;
@@ -39,23 +49,30 @@ export const prepareDefaultExtendedSDL = (fileName, schema) => {
   return new Source(body, fileName);
 };
 
-export const getDynamicUserSDLTest = (fileName, remoteSchema) => {
+export const getDynamicUserSDLTest = (remoteSchema) => {
   if (!remoteSchema) {
-    return prepareDefaultSDL(fileName);
+    return prepareDefaultSDL();
   }
 
-  return prepareDefaultExtendedSDL(fileName, remoteSchema);
+  return prepareDefaultExtendedSDL(remoteSchema);
 };
 
-export const mergeUserSDL = (fileName, remoteSchema) => {
-  let userSDL = existsSync(fileName) && readSDL(fileName);
-  if (!userSDL) {
-    userSDL = getDynamicUserSDLTest(fileName, remoteSchema);
+export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
+  const userSDL = getUserSDLAndConvertToSource();
+  if (userSDL) {
+    return userSDL;
   }
-  return userSDL;
+
+  console.log('ARE WE GETTING HERE?');
+  return getDynamicUserSDLTest(remoteSchema);
 };
 
 export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
+  if (!remoteSDL) {
+    return userSDL;
+  }
+
+  // apply faker defintions
   try {
     return remoteSDL
       ? buildWithFakeDefinitions(remoteSDL, userSDL)
@@ -68,25 +85,28 @@ export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
   }
 };
 
-export const prepareRemoteSchema = async (extendURL, headers) => {
+export const prepareRemoteSchema = async () => {
+  const extendURL = getSchemaExtendURL();
+
   if (!extendURL) {
     return;
   }
   try {
-    return await getRemoteSchema(extendURL, headers);
+    return await getRemoteSchema(extendURL);
   } catch (error) {
     console.log(chalk.red(error.stack));
     process.exit(1);
   }
 };
 
-export const prepareRemoteSDL = (remoteSchema, extendURL) => {
-  if (!remoteSchema) {
+export const prepareRemoteSDL = (remoteSDL) => {
+  if (!remoteSDL) {
     return;
   }
 
+  const extendURL = getSchemaExtendURL();
   return new Source(
-    printSchema(remoteSchema),
+    printSchema(remoteSDL),
     `Introspection from "${extendURL}"`,
   );
 };

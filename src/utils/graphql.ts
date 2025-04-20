@@ -8,12 +8,16 @@ import {
 import { Options } from 'express-graphql';
 // TODO - fake_schema kept seperate, it should potentially be moved out of the utils folder
 import { fakeFieldResolver, fakeTypeResolver } from 'src/utils/fake_schema';
-import { getProxyExecuteFn } from 'src/utils';
+import {
+  getCustomHeaders,
+  getProxyExecuteFn,
+  getSchemaExtendURL,
+} from 'src/utils';
 
 export function graphqlRequest(
   url,
-  headers,
   query,
+  headers?,
   variables?,
   operationName?,
 ) {
@@ -37,16 +41,12 @@ export function graphqlRequest(
 }
 
 export const getGraphqlHTTPOptions = async (
-  options,
   schema: GraphQLSchema,
 ): Promise<Options> => {
-  const { extendURL, headers, forwardHeaders } = options;
+  const extendURL = getSchemaExtendURL();
+  const forwardHeaders = getCustomHeaders();
 
-  const customExecuteFn = await getProxyExecuteFn(
-    extendURL,
-    headers,
-    forwardHeaders,
-  );
+  const customExecuteFn = await getProxyExecuteFn(extendURL, forwardHeaders);
 
   return {
     schema,
@@ -57,20 +57,8 @@ export const getGraphqlHTTPOptions = async (
   };
 };
 
-export const getCorsOptions = (_options) => {
-  const allowedHosts = process.env.ALLOWED_HOSTS || '';
-  return {
-    credentials: true,
-    // origin: options?.corsOrigin,
-    origin: allowedHosts,
-  };
-};
-
-export function getRemoteSchema(
-  url: string,
-  headers: { [name: string]: string },
-): Promise<GraphQLSchema> {
-  return graphqlRequest(url, headers, getIntrospectionQuery())
+export function getRemoteSchema(url: string): Promise<GraphQLSchema> {
+  return graphqlRequest(url, getIntrospectionQuery())
     .then((response) => {
       if (response.errors) {
         throw Error(JSON.stringify(response.errors, null, 2));

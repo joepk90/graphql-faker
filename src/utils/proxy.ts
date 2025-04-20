@@ -14,11 +14,10 @@ import { IncomingMessage } from 'http';
 
 import { graphqlRequest } from 'src/utils';
 
-export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
+export const getProxyExecuteFn = async (url, forwardHeaders) => {
   // return undefined if no url is passed
   if (!url) return;
 
-  //TODO: proxy extensions
   return async (args: ExecutionArgs) => {
     const { schema, document, contextValue, operationName } = args;
 
@@ -28,6 +27,12 @@ export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
       proxyHeaders[name] = request.headers[name];
     }
 
+    // test validation
+    // try {
+    //   removeUnusedVariables(stripExtensionFields(schema, document));
+    // } catch (error) {
+    //   console.log('error: ', error);
+    // }
     const strippedAST = removeUnusedVariables(
       stripExtensionFields(schema, document),
     );
@@ -39,8 +44,8 @@ export const getProxyExecuteFn = async (url, headers, forwardHeaders) => {
 
     const response = await graphqlRequest(
       url,
-      { ...headers, ...proxyHeaders },
       print(operationAST),
+      { ...proxyHeaders },
       args.variableValues,
       operationName,
     );

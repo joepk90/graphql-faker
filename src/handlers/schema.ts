@@ -1,10 +1,18 @@
 import * as chalk from 'chalk';
 import * as fs from 'fs';
 
-export const schemaHandlerPost = (userSDL) => {
+import {
+  getUserSDLWithDefaultSDLFallback,
+  prepareRemoteSchema,
+  prepareRemoteSDL,
+  getSchemaFileName,
+} from 'src/utils';
+
+export const schemaHandlerPost = () => {
+  const fileName = getSchemaFileName();
+
   return (req, res) => {
     try {
-      const fileName = userSDL.name;
       fs.writeFileSync(fileName, req.body);
 
       const date = new Date().toLocaleString();
@@ -21,8 +29,12 @@ export const schemaHandlerPost = (userSDL) => {
   };
 };
 
-export const schemaHandlerGet = (userSDL, remoteSDL) => {
-  return (_, res) => {
+export const schemaHandlerGet = () => {
+  return async (_, res) => {
+    const remoteSchema = await prepareRemoteSchema();
+    const userSDL = getUserSDLWithDefaultSDLFallback(remoteSchema);
+    const remoteSDL = prepareRemoteSDL(remoteSchema);
+
     res.status(200).json({
       userSDL: userSDL.body,
       remoteSDL: remoteSDL?.body,
