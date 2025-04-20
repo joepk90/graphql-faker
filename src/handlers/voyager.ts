@@ -24,3 +24,15 @@ export const voyagerMiddleware = () => {
     },
   });
 };
+
+// ALSO WORKS
+// export const voyagerMiddlewareRenderPage = () => {
+//   return (_req, res) => {
+//     res.send(
+//       renderVoyagerPage({
+//         endpointUrl: '/graphql',
+//         headersJS: getAuthorizationHeader(),
+//       }),
+//     );
+//   };
+// };
