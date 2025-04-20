@@ -6,3 +6,6 @@ The Front End (Editor) has been moved to a new repository, this now just handled
 The Front End Project can be found here:
 [https://github.com/joepk90/graphql-editor](github.com/joepk90/graphql-editor) 
 
+
+## TODO
+- Potentially move the AUTH_TOKEN logic out of this repository - auth tokens should be coming from the front end.
