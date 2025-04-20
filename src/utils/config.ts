@@ -1,5 +1,6 @@
 export const getSchemaFileName = () => process.env.SCHEMA_FILE_NAME;
 export const getSchemaExtendURL = () => process.env.EXTEND_URL;
+export const getAuthToken = () => process.env.AUTH_TOKEN;
 export const getPort = () => process.env.PORT || '9092';
 export const getOpenBrowser = () =>
   process.env.OPEN_BROWSER === 'TRUE' || false;

@@ -2,15 +2,13 @@ import * as express from 'express';
 import * as path from 'path';
 import { express as graphqlVoyagerMiddleware } from 'graphql-voyager/middleware';
 
-import { projectRoot } from 'src/utils';
+import { projectRoot, getAuthToken } from 'src/utils';
 
 const voyagerPath = 'node_modules/graphql-voyager/dist/voyager.worker.js';
 
 const getAuthorizationHeader = () => {
-  const token = process.env.AUTH_TOKEN || '';
-
   return JSON.stringify({
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${getAuthToken()}`,
   });
 };
 
