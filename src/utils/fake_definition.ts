@@ -212,9 +212,7 @@ function schemaToDocumentNode(schema: GraphQLSchema): DocumentNode {
 export function buildWithFakeDefinitions(
   schemaSDL: Source, // remote SDL
   extensionSDL?: Source, // userSDL
-  options?: { skipValidation: boolean },
 ): GraphQLSchema {
-  const skipValidation = options?.skipValidation ?? false;
   const schemaAST = parseSDL(schemaSDL);
 
   // Remove Faker's own definitions that were added to have valid SDL for other
@@ -252,46 +250,42 @@ export function buildWithFakeDefinitions(
     }
   }
 
-  if (!skipValidation) {
-    const errors = validateSchema(schema);
-    if (errors.length !== 0) {
-      throw new ValidationErrors(errors);
-    }
+  const errors = validateSchema(schema);
+  if (errors.length !== 0) {
+    throw new ValidationErrors(errors);
   }
 
   return schema;
+}
 
-  function extendSchemaWithAST(
-    schema: GraphQLSchema, // remoteSDL
-    extensionAST: DocumentNode, // userSDL
-  ): GraphQLSchema {
-    if (!skipValidation) {
-      // fix: allowing us to override properties of the remote schema
-      // using the validateSDL function and passing both the remote Schema and custom schema means
-      // we cannot override types on the main schema:
-      // const validatedSDL = validateSDL(extensionAST, schema); // THIS IS THE PROBLEM
-      // instead we just validate the schema (remove schema), and then later on merge schemas and validate
-      // validating the mains schema may already be being done before it is passed to this function - potentially
-      // should be completely removed
-      const validatedSDL = validateSDL(schemaToDocumentNode(schema)); // THIS IS THE PROBLEM
+function extendSchemaWithAST(
+  schema: GraphQLSchema, // remoteSDL
+  extensionAST: DocumentNode, // userSDL
+): GraphQLSchema {
+  // fix: allowing us to override properties of the remote schema
+  // using the validateSDL function and passing both the remote Schema and custom schema means
+  // we cannot override types on the main schema:
+  // const validatedSDL = validateSDL(extensionAST, schema); // THIS IS THE PROBLEM
+  // instead we just validate the schema (remove schema), and then later on merge schemas and validate
+  // validating the mains schema may already be being done before it is passed to this function - potentially
+  // should be completely removed
+  const validatedSDL = validateSDL(schemaToDocumentNode(schema)); // THIS IS THE PROBLEM
 
-      const validatedWithFakeDefsErrors = validate(
-        schemaWithOnlyFakedDefinitions,
-        extensionAST,
-        [ValuesOfCorrectTypeRule],
-      );
+  const validatedWithFakeDefsErrors = validate(
+    schemaWithOnlyFakedDefinitions,
+    extensionAST,
+    [ValuesOfCorrectTypeRule],
+  );
 
-      const errors = [...validatedSDL, ...validatedWithFakeDefsErrors];
-      if (errors.length !== 0) {
-        throw new ValidationErrors(errors);
-      }
-    }
-
-    return extendSchema(schema, extensionAST, {
-      assumeValid: true,
-      commentDescriptions: true,
-    });
+  const errors = [...validatedSDL, ...validatedWithFakeDefsErrors];
+  if (errors.length !== 0) {
+    throw new ValidationErrors(errors);
   }
+
+  return extendSchema(schema, extensionAST, {
+    assumeValid: true,
+    commentDescriptions: true,
+  });
 }
 
 // FIXME: move to 'graphql-js'
