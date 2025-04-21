@@ -10,3 +10,5 @@ The Front End Project can be found here:
 ## TODO
 - Potentially move the AUTH_TOKEN logic out of this repository - auth tokens should be coming from the front end.
     - It seems AUTH_TOKEN is currently required to handle authentication for Voyager -need to work out how to add it from the front end.
+- Update .graphql files - remove/change content
+- Share graphlql volume with host computure
