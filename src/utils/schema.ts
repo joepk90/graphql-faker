@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 
+import { mkdirSync } from 'fs';
 import { Source, GraphQLSchema, printSchema } from 'graphql';
 import {
   existsSync,
@@ -20,6 +21,12 @@ import {
   buildWithFakeDefinitions,
   ValidationErrors,
 } from 'src/utils/fake_definition';
+
+export const createDirIfNonExistent = (dir: string) => {
+  if (!existsSync(dir)) {
+    mkdirSync(dir);
+  }
+};
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
