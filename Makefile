@@ -11,6 +11,7 @@ docker-build:
 docker-run:
 	docker run -it \
 	-p 9092:9092 \
+	-e SCHEMA_FILE_NAME=schema_extension \
 	-e ALLOWED_HOSTS=http://localhost:8080 \
 	-e PORT=9092 \
 	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \
@@ -19,6 +20,7 @@ docker-run:
 docker-debug:
 	docker run -it \
 	-p 9092:9092 \
+	-e SCHEMA_FILE_NAME=schema_extension \
 	-e ALLOWED_HOSTS=http://localhost:8080 \
 	-e PORT=9092 \
 	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \

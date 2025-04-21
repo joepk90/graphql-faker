@@ -11,6 +11,8 @@ import {
   corsMiddleware,
   getPort,
   routeDebuggingMiddleware,
+  createDirIfNonExistent,
+  customSchemaExtensionsDirName,
 } from 'src/utils';
 
 import {
@@ -23,6 +25,9 @@ import {
 
 export const runServer = async () => {
   const app = express();
+
+  // TODO make dependant on if SCHEMA_FILE_NAME has been provided + move to util function
+  createDirIfNonExistent(customSchemaExtensionsDirName);
 
   // graphql
   app.options('/graphql', corsMiddleware());
