@@ -68,7 +68,6 @@ export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
     return userSDL;
   }
 
-  console.log('ARE WE GETTING HERE?');
   return getDynamicUserSDLTest(remoteSchema);
 };
 
