@@ -12,6 +12,7 @@
 
 # graphql files on the root dir
 /*.graphql
+/schema-extensions/**.graphql
 
 # editor output
 src/editor/main.js
