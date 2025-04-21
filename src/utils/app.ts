@@ -22,7 +22,8 @@ export const corsMiddleware = () => {
   return cors(getCorsOptions());
 };
 
-export const shutdown = (server) => {
+export const shutdown = (server, input) => {
+  console.log(`Received ${input}. Gracefully shutting down.`);
   server.close();
   process.exit(0);
 };

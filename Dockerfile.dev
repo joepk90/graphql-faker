@@ -1,0 +1,14 @@
+# THIS FILE IS NOT CURRENTY IN USE
+FROM node:20-slim
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install 
+
+COPY . .
+
+EXPOSE 9092
+
+CMD ["npm", "run", "serve:dev"]

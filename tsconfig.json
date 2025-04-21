@@ -12,10 +12,12 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "lib": ["es2017"],
+    "outDir": "dist",
+    "rootDir": "src",
     "baseUrl": ".",         
     "paths": {
       "src/*": ["src/*"]
-    }
+    },
   },
   "compileOnSave": false,
   "exclude": ["src/editor", "node_modules", ".tmp", "lib"],

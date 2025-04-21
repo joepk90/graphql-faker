@@ -48,6 +48,6 @@ export const runServer = async () => {
   openEditorInBrowser();
 
   // shutdown
-  process.on('SIGINT', () => shutdown(server));
-  process.on('SIGTERM', () => shutdown(server));
+  process.on('SIGINT', () => shutdown(server, 'SIGINT'));
+  process.on('SIGTERM', () => shutdown(server, 'SIGTERM'));
 };

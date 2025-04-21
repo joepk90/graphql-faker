@@ -27,7 +27,9 @@
     "check": "tsc --noEmit",
     "start": "nodemon src/index.ts",
     "debug": "ts-node --inspect --compilerOptions '{\"inlineSources\":true}' src/index.ts",
-    "build:typescript": "tsc",
+    "build": "tsc",
+    "serve:dev": "ts-node -r tsconfig-paths/register src/index.ts",
+    "serve:prod": "ts-node -r tsconfig-paths/register dist/index.js",
     "prettier": "prettier --cache --ignore-path .gitignore --write --list-different .",
     "prettier:check": "prettier --cache --ignore-path .gitignore --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'"
