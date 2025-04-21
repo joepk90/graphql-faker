@@ -9,12 +9,12 @@ import {
   isObjectType,
   Kind,
   parse,
+  printSchema,
   Source,
   validate,
   validateSchema,
   ValuesOfCorrectTypeRule,
 } from 'graphql';
-// FIXME
 import { validateSDL } from 'graphql/validation/validate';
 
 const fakeDefinitionAST = parse(/* GraphQL */ `
@@ -202,9 +202,16 @@ const schemaWithOnlyFakedDefinitions = buildASTSchema(fakeDefinitionAST);
 // FIXME: mark it as valid to be able to run `validate`
 schemaWithOnlyFakedDefinitions['__validationErrors'] = [];
 
+// this function might be a duplicate or unneccesary - TODO move to util file
+function schemaToDocumentNode(schema: GraphQLSchema): DocumentNode {
+  const sdlString = printSchema(schema); // Step 1: Convert schema to SDL string
+  const documentNode = parse(sdlString); // Step 2: Parse string into DocumentNode
+  return documentNode;
+}
+
 export function buildWithFakeDefinitions(
-  schemaSDL: Source,
-  extensionSDL?: Source,
+  schemaSDL: Source, // remote SDL
+  extensionSDL?: Source, // userSDL
   options?: { skipValidation: boolean },
 ): GraphQLSchema {
   const skipValidation = options?.skipValidation ?? false;
@@ -255,16 +262,26 @@ export function buildWithFakeDefinitions(
   return schema;
 
   function extendSchemaWithAST(
-    schema: GraphQLSchema,
-    extensionAST: DocumentNode,
+    schema: GraphQLSchema, // remoteSDL
+    extensionAST: DocumentNode, // userSDL
   ): GraphQLSchema {
     if (!skipValidation) {
-      const errors = [
-        ...validateSDL(extensionAST, schema),
-        ...validate(schemaWithOnlyFakedDefinitions, extensionAST, [
-          ValuesOfCorrectTypeRule,
-        ]),
-      ];
+      // fix: allowing us to override properties of the remote schema
+      // using the validateSDL function and passing both the remote Schema and custom schema means
+      // we cannot override types on the main schema:
+      // const validatedSDL = validateSDL(extensionAST, schema); // THIS IS THE PROBLEM
+      // instead we just validate the schema (remove schema), and then later on merge schemas and validate
+      // validating the mains schema may already be being done before it is passed to this function - potentially
+      // should be completely removed
+      const validatedSDL = validateSDL(schemaToDocumentNode(schema)); // THIS IS THE PROBLEM
+
+      const validatedWithFakeDefsErrors = validate(
+        schemaWithOnlyFakedDefinitions,
+        extensionAST,
+        [ValuesOfCorrectTypeRule],
+      );
+
+      const errors = [...validatedSDL, ...validatedWithFakeDefsErrors];
       if (errors.length !== 0) {
         throw new ValidationErrors(errors);
       }
