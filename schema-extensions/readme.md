@@ -1,0 +1,1 @@
+This directory used to save graphql schemes saved via the editor. These schema files should not be tracked.
