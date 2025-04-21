@@ -10,6 +10,9 @@ import {
   getRemoteSchema,
   getSchemaFileName,
   getSchemaExtendURL,
+  customSchemaExtensionsDirName,
+  defaultSchemaFileName,
+  extendedSchemaFileName,
 } from 'src/utils';
 
 // TODO - fake_definition kept seperate, it should potentially be moved out of the utils folder
@@ -18,14 +21,16 @@ import {
   ValidationErrors,
 } from 'src/utils/fake_definition';
 
-const defaultSchemaFileName = 'default-schema.graphql';
-const extendedSchemaFileName = 'default-extend.graphql';
-
 // TODO review fs.readFileSync usage - can this be abstracted?
 
-const getUserSDLAndConvertToSource = () => {
+export const getCustomerSchemaFilePath = () => {
   const fileName = getSchemaFileName();
-  return existsSync(fileName) && readSDL(fileName);
+  return `${customSchemaExtensionsDirName}/${fileName}.graphql`;
+};
+
+const getCustomerSchemaAndConvertToSource = () => {
+  const filePath = getCustomerSchemaFilePath();
+  return existsSync(filePath) && readSDL(filePath);
 };
 
 export const getUserSDL = (fileName) =>
@@ -58,7 +63,7 @@ export const getDynamicUserSDLTest = (remoteSchema) => {
 };
 
 export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
-  const userSDL = getUserSDLAndConvertToSource();
+  const userSDL = getCustomerSchemaAndConvertToSource();
   if (userSDL) {
     return userSDL;
   }

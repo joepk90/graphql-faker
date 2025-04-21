@@ -1,3 +1,7 @@
+export const customSchemaExtensionsDirName = 'schema-extensions';
+export const defaultSchemaFileName = 'default-schema.graphql';
+export const extendedSchemaFileName = 'default-extend.graphql';
+
 export const getSchemaFileName = () => process.env.SCHEMA_FILE_NAME;
 export const getSchemaExtendURL = () => process.env.EXTEND_URL;
 export const getAuthToken = () => process.env.AUTH_TOKEN;
