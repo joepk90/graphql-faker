@@ -55,6 +55,7 @@ export const prepareDefaultExtendedSDL = (schema) => {
   const fileName = getSchemaFileName();
   let body = getUserSDL(extendedSchemaFileName);
 
+  // TODO: CONVERT UTIL FUNCTION!
   const rootTypeName = schema.getQueryType().name;
   body = body.replace('___RootTypeName___', rootTypeName);
 
