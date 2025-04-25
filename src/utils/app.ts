@@ -36,6 +36,7 @@ export const logServerStartup = () => {
   
     ${chalk.blue('❯')} GraphQL API:        http://localhost:${port}/graphql
     ${chalk.blue('❯')} GraphQL Voyager:    http://localhost:${port}/voyager
+    ${chalk.blue('❯')} Extended Schema:    http://localhost:${port}/user-sdl
   
     `);
 };
