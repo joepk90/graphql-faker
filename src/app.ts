@@ -7,7 +7,6 @@ import {
   editorDir,
   shutdown,
   logServerStartup,
-  openEditorInBrowser,
   corsMiddleware,
   getPort,
   routeDebuggingMiddleware,
@@ -50,7 +49,6 @@ export const runServer = async () => {
   const port = getPort();
   const server = app.listen(port);
   logServerStartup();
-  openEditorInBrowser();
 
   // shutdown
   process.on('SIGINT', () => shutdown(server, 'SIGINT'));

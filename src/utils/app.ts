@@ -1,8 +1,7 @@
 import * as chalk from 'chalk';
-import * as open from 'open';
 import * as cors from 'cors';
 
-import { getAllowedHosts, getPort, getOpenBrowser } from 'src/utils';
+import { getAllowedHosts, getPort } from 'src/utils';
 
 export const routeDebuggingMiddleware = (req, _, next) => {
   console.log('Request URL:', req.url);
@@ -39,13 +38,4 @@ export const logServerStartup = () => {
     ${chalk.blue('❯')} Extended Schema:    http://localhost:${port}/user-sdl
   
     `);
-};
-
-export const openEditorInBrowser = () => {
-  const openBrowser = getOpenBrowser();
-
-  if (openBrowser) {
-    const port = getPort();
-    setTimeout(() => open(`http://localhost:${port}/editor`), 500);
-  }
 };
