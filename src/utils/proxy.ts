@@ -12,11 +12,18 @@ import {
 } from 'graphql';
 import { IncomingMessage } from 'http';
 
-import { graphqlRequest } from 'src/utils';
+import {
+  graphqlRequest,
+  getHeadersToForward,
+  getSchemaExtendURL,
+} from 'src/utils';
 
-export const getProxyExecuteFn = async (url, forwardHeaders) => {
+export const getProxyExecuteFn = async () => {
+  const extendURL = getSchemaExtendURL();
+  const forwardHeaders = getHeadersToForward();
+
   // return undefined if no url is passed
-  if (!url) return;
+  if (!extendURL) return;
 
   return async (args: ExecutionArgs) => {
     const { schema, document, contextValue, operationName } = args;
@@ -43,7 +50,7 @@ export const getProxyExecuteFn = async (url, forwardHeaders) => {
       : Object.values(operations)[0];
 
     const response = await graphqlRequest(
-      url,
+      extendURL,
       print(operationAST),
       { ...proxyHeaders },
       args.variableValues,

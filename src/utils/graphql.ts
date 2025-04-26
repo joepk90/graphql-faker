@@ -8,11 +8,7 @@ import {
 import { Options } from 'express-graphql';
 // TODO - fake_schema kept seperate, it should potentially be moved out of the utils folder
 import { fakeFieldResolver, fakeTypeResolver } from 'src/utils/fake_schema';
-import {
-  getHeadersToForward,
-  getProxyExecuteFn,
-  getSchemaExtendURL,
-} from 'src/utils';
+import { getProxyExecuteFn } from 'src/utils';
 
 export function graphqlRequest(
   url,
@@ -43,10 +39,7 @@ export function graphqlRequest(
 export const getGraphqlHTTPOptions = async (
   schema: GraphQLSchema,
 ): Promise<Options> => {
-  const extendURL = getSchemaExtendURL();
-  const forwardHeaders = getHeadersToForward();
-
-  const customExecuteFn = await getProxyExecuteFn(extendURL, forwardHeaders);
+  const customExecuteFn = await getProxyExecuteFn();
 
   return {
     schema,
