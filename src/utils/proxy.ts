@@ -10,17 +10,41 @@ import {
   visit,
   visitWithTypeInfo,
 } from 'graphql';
-import { IncomingMessage } from 'http';
+import { IncomingMessage, IncomingHttpHeaders } from 'http';
 
 import {
   graphqlRequest,
   getHeadersToForward,
   getSchemaExtendURL,
+  getCustomHeaders,
+  mergeObjectsIgnoreCase,
+  copyHeadersFromRequest,
 } from 'src/utils';
+
+/**
+ * getHeaders will get both
+ * - the headers from the request, using specified headers in the FORWARD_HEADERS env var
+ * - get headers specified in the .headers.json file
+ *
+ * it then merges both sets of headers, prioritising the headers from the .headers.json file
+ * @param requestHeaders
+ * @returns
+ */
+
+const getHeaders = (requestHeaders: IncomingHttpHeaders) => {
+  const forwardHeaders = getHeadersToForward();
+  const customHeaders = getCustomHeaders();
+
+  const headersToForward = copyHeadersFromRequest(
+    requestHeaders,
+    forwardHeaders,
+  );
+
+  return mergeObjectsIgnoreCase(headersToForward, customHeaders);
+};
 
 export const getProxyExecuteFn = async () => {
   const extendURL = getSchemaExtendURL();
-  const forwardHeaders = getHeadersToForward();
 
   // return undefined if no url is passed
   if (!extendURL) return;
@@ -29,10 +53,7 @@ export const getProxyExecuteFn = async () => {
     const { schema, document, contextValue, operationName } = args;
 
     const request = contextValue as IncomingMessage;
-    const proxyHeaders = Object.create(null);
-    for (const name of forwardHeaders) {
-      proxyHeaders[name] = request.headers[name];
-    }
+    const headers = getHeaders(request.headers);
 
     // test validation
     // try {
@@ -52,7 +73,7 @@ export const getProxyExecuteFn = async () => {
     const response = await graphqlRequest(
       extendURL,
       print(operationAST),
-      { ...proxyHeaders },
+      headers,
       args.variableValues,
       operationName,
     );

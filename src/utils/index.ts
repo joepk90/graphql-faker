@@ -6,3 +6,5 @@ export * from './proxy';
 export * from './graphql';
 export * from './schema';
 export * from './app';
+export * from './http';
+export * from './utils';

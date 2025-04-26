@@ -1,15 +1,14 @@
 import * as express from 'express';
 import * as path from 'path';
 import { express as graphqlVoyagerMiddleware } from 'graphql-voyager/middleware';
-
-import { projectRoot, getAuthToken } from 'src/utils';
+import { projectRoot, getCustomHeaders } from 'src/utils';
 
 const voyagerPath = 'node_modules/graphql-voyager/dist/voyager.worker.js';
 
-const getAuthorizationHeader = () => {
-  return JSON.stringify({
-    Authorization: `Bearer ${getAuthToken()}`,
-  });
+const getHeaders = () => {
+  console.log('test');
+  const customHeaders = getCustomHeaders();
+  return JSON.stringify(customHeaders);
 };
 
 export const voyagerWorkerMiddleware = () => {
@@ -18,7 +17,7 @@ export const voyagerWorkerMiddleware = () => {
 export const voyagerMiddleware = () => {
   return graphqlVoyagerMiddleware({
     endpointUrl: '/graphql',
-    headersJS: getAuthorizationHeader(),
+    headersJS: getHeaders(),
     displayOptions: {
       headerEditorEnabled: true,
     },
