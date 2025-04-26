@@ -1,14 +1,41 @@
-# GraphQL Faker Refactor
-A refactor of the [https://github.com/graphql-kit/graphql-faker](github.com/graphql-kit/graphql-faker) project. Libraries have been updated, and the code restructured - It's an improvement (IMO), but there is more that can be done.
+# GraphQL Faker Server
+A refactor of the [https://github.com/graphql-kit/graphql-faker](https://ggithub.com/graphql-kit/graphql-faker) project.
 
-The Front End (Editor) has been moved to a new repository, this now just handled the backend service that requests data from graphql and saves a customer SDL file.
+The main reason for making this project was to change the functionality of extending types. It is now possible to override existing fields on existing types, and return data you define. For more details of the complete project see:
+[github.com/joepk90/graphql-faker-refactored](https://github.com/joepk90/graphql-faker-refactored)
 
-The Front End Project can be found here:
-[https://github.com/joepk90/graphql-editor](github.com/joepk90/graphql-editor) 
+---
+
+This repository just handles the server side logic of the original GraphQL Faker project, allowing users to create a local custom GraphQL schema using `fakerJS` definitions, as well as the ability of overriding any existing remote schema by acting a GraphQL broker, intercepting requests and overriding the response to return fake data to the client.
+
+The Front End (Editor) has been moved to a new repository, which can be found here:
+[github.com/joepk90/graphql-faker-editor](https://github.com/joepk90/graphql-faker-editor) 
+
+## Development
+
+To start the project run the following command
+```
+# clone the repository
+git clone git@github.com:joepk90/graphql-faker-server.git
+
+# move into the repository
+cd graphql-faker-server
+
+# create an .env file using env.example
+# cp .env.example .env
+
+# start the service
+make dev
+```
 
 
-## TODO
-- Potentially move the AUTH_TOKEN logic out of this repository - auth tokens should be coming from the front end.
-    - It seems AUTH_TOKEN is currently required to handle authentication for Voyager -need to work out how to add it from the front end.
-- Update .graphql files - remove/change content
-- Share graphlql volume with host computure
+# Options
+
+| **Environment Variables**    | **Description**                                                                                         |
+|------------------------------|---------------------------------------------------------------------------------------------------------|
+| `ALLOWED_HOSTS`              | Hosts allowed to access the server (primarily used to manage CORS locally).                             |
+| `PORT`                       | HTTP Port [default: `env.PORT` or `9002`].                                                              |
+| `SCHEMA_FILE_NAME`           | Name of the Schema file you want to edit (TODO: these should be shared locally with the host computer). |
+| `EXTEND_URL`                 | URL to an existing GraphQL server to extend.                                                            |
+| `OPEN_BROWSER`               | Open the server (TODO: this feature should be changed to the front-end editor instead).                 |
+| `CUSTOM_HEADERS`             | Specify which headers should be forwarded to the proxied server (TODO: this should be changed to forward headers). |

@@ -1,5 +1,5 @@
 DOCKER_REGISTRY=jparkkennaby
-IMAGE_NAME=graphql-faker
+IMAGE_NAME=graphql-faker-server
 DOCKER_IMAGE=$(DOCKER_REGISTRY)/$(IMAGE_NAME)
 
 dev:
