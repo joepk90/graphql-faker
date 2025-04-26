@@ -27,8 +27,7 @@
     "graphql": "14.7.0",
     "graphql-voyager": "1.0.0-rc.31",
     "moment": "2.29.1",
-    "node-fetch": "2.6.1",
-    "open": "8.0.5"
+    "node-fetch": "2.6.1"
   },
   "devDependencies": {
     "@types/body-parser": "1.19.0",
