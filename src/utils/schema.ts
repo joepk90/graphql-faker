@@ -80,10 +80,6 @@ export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
 };
 
 export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
-  if (!remoteSDL) {
-    return userSDL;
-  }
-
   // apply faker defintions
   try {
     return remoteSDL
