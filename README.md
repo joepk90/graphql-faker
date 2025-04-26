@@ -33,9 +33,8 @@ make dev
 
 | **Environment Variables**    | **Description**                                                                                         |
 |------------------------------|---------------------------------------------------------------------------------------------------------|
-| `ALLOWED_HOSTS`              | Hosts allowed to access the server (primarily used to manage CORS locally).                             |
-| `PORT`                       | HTTP Port [default: `env.PORT` or `9002`].                                                              |
 | `SCHEMA_FILE_NAME`           | Name of the Schema file you want to edit (TODO: these should be shared locally with the host computer). |
 | `EXTEND_URL`                 | URL to an existing GraphQL server to extend.                                                            |
-| `OPEN_BROWSER`               | Open the server (TODO: this feature should be changed to the front-end editor instead).                 |
-| `CUSTOM_HEADERS`             | Specify which headers should be forwarded to the proxied server (TODO: this should be changed to forward headers). |
+| `FORWARD_HEADERS`             | Specify which headers should be forwarded to the proxied server (TODO: this should be changed to forward headers). |
+| `ALLOWED_HOSTS`              | Hosts allowed to access the server (primarily used to manage CORS locally) [default: `http://localhost:8080,`].                             |
+| `SERVER_PORT`                       | HTTP Port [default: `env.PORT` or `9002`].                                                              |
