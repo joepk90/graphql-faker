@@ -33,8 +33,9 @@ make dev
 
 | **Environment Variables**    | **Description**                                                                                         |
 |------------------------------|---------------------------------------------------------------------------------------------------------|
-| `SCHEMA_FILE_NAME`           | Name of the Schema file you want to edit (TODO: these should be shared locally with the host computer). |
-| `EXTEND_URL`                 | URL to an existing GraphQL server to extend.                                                            |
-| `FORWARD_HEADERS`             | Specify which headers should be forwarded to the proxied server (TODO: this should be changed to forward headers). |
+| `SCHEMA_FILE_NAME`           | Name of the Schema file you want to edit.                               |
+| `EXTEND_URL`                 | URL to an existing GraphQL server to extend.                            |
+| `FORWARD_HEADERS`             | Specify which headers should be forwarded to the proxied server  |
+| `CUSTOM_HEADERS`              | Option to add custom headers to GraphQL requests (Currently required in order to use Voyager) [default: `FALSE`].                             |
 | `ALLOWED_HOSTS`              | Hosts allowed to access the server (primarily used to manage CORS locally) [default: `http://localhost:8080,`].                             |
 | `SERVER_PORT`                       | HTTP Port [default: `env.PORT` or `9002`].                                                              |
