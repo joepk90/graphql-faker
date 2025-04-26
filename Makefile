@@ -31,3 +31,16 @@ docker-tag:
 
 docker-push:
 	docker push ${DOCKER_IMAGE}:latest
+
+
+# custom
+docker-run-with-custom-headers:
+	docker run -it \
+	-p 9092:9092 \
+	-e SCHEMA_FILE_NAME=schema_extension \
+	-e ALLOWED_HOSTS=http://localhost:8080 \
+	-e PORT=9092 \
+	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \
+	-e CUSTOM_HEADERS=TRUE \
+	-v $(PWD)/.headers:/app/.headers \
+	${DOCKER_IMAGE}
