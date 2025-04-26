@@ -6,7 +6,7 @@ import {
   prepareRemoteSchema,
   prepareRemoteSDL,
   getSchemaFileName,
-  getCustomerSchemaFilePath,
+  getCustomSchemaFilePath,
 } from 'src/utils';
 
 export const schemaHandlerPost = () => {
@@ -14,7 +14,7 @@ export const schemaHandlerPost = () => {
 
   return (req, res) => {
     try {
-      const customSchemaFilePath = getCustomerSchemaFilePath();
+      const customSchemaFilePath = getCustomSchemaFilePath();
       fs.writeFileSync(customSchemaFilePath, req.body);
 
       const date = new Date().toLocaleString();

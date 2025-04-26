@@ -30,13 +30,13 @@ export const createDirIfNonExistent = (dir: string) => {
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
-export const getCustomerSchemaFilePath = () => {
+export const getCustomSchemaFilePath = () => {
   const fileName = getSchemaFileName();
   return `${customSchemaExtensionsDirName}/${fileName}.graphql`;
 };
 
 const getCustomerSchemaAndConvertToSource = () => {
-  const filePath = getCustomerSchemaFilePath();
+  const filePath = getCustomSchemaFilePath();
   return existsSync(filePath) && readSDL(filePath);
 };
 
