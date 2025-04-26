@@ -22,3 +22,4 @@ src/editor/main.css.map
 
 .env
 .notes
+.headers.json
