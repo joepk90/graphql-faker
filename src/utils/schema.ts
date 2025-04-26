@@ -54,11 +54,17 @@ const getCustomerSchemaAndConvertToSource = () => {
   return existsSync(filePath) && readSDL(filePath);
 };
 
-export const getUserSDL = (fileName) =>
-  fs.readFileSync(path.join(schemaDir, fileName), 'utf-8');
+const getFile = (filepath: string) => {
+  return fs.readFileSync(filepath, 'utf-8');
+};
+
+export const getUserSDL = (fileName: string) => {
+  const filePath = path.join(schemaDir, fileName);
+  return getFile(filePath);
+};
 
 export const readSDL = (filepath: string): Source =>
-  new Source(fs.readFileSync(filepath, 'utf-8'), filepath);
+  new Source(getFile(filepath), filepath);
 
 export const prepareDefaultSDL = () => {
   const fileName = getSchemaFileNameWithRemoteSchemaExt();
