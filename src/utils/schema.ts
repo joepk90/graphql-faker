@@ -30,8 +30,22 @@ export const createDirIfNonExistent = (dir: string) => {
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
-export const getCustomSchemaFilePath = () => {
+// if a remote schema is in use, appent `-ext` to the file, otherwise if a user attempts
+// to use the app again but wihout a remote schema, this file will be loaded but won't work,
+// because the service is no longer in extend mode
+export const getSchemaFileNameWithRemoteSchemaExt = () => {
   const fileName = getSchemaFileName();
+  const extenedUrl = getSchemaExtendURL();
+
+  if (extenedUrl) {
+    return fileName + '-ext';
+  }
+
+  return fileName;
+};
+
+export const getCustomSchemaFilePath = () => {
+  const fileName = getSchemaFileNameWithRemoteSchemaExt();
   return `${customSchemaExtensionsDirName}/${fileName}.graphql`;
 };
 
@@ -47,12 +61,12 @@ export const readSDL = (filepath: string): Source =>
   new Source(fs.readFileSync(filepath, 'utf-8'), filepath);
 
 export const prepareDefaultSDL = () => {
-  const fileName = getSchemaFileName();
+  const fileName = getSchemaFileNameWithRemoteSchemaExt();
   return new Source(getUserSDL(defaultSchemaFileName), fileName);
 };
 
 export const prepareDefaultExtendedSDL = (schema) => {
-  const fileName = getSchemaFileName();
+  const fileName = getSchemaFileNameWithRemoteSchemaExt();
   let body = getUserSDL(extendedSchemaFileName);
 
   // TODO: CONVERT UTIL FUNCTION!
