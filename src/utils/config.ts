@@ -5,7 +5,7 @@ export const extendedSchemaFileName = 'default-extend.graphql';
 export const getSchemaFileName = () => process.env.SCHEMA_FILE_NAME;
 export const getSchemaExtendURL = () => process.env.EXTEND_URL;
 export const getAuthToken = () => process.env.AUTH_TOKEN;
-export const getPort = () => process.env.PORT || '9092';
+export const getPort = () => process.env.SERVER_PORT || '9092';
 export const getForwardHeaders = () =>
   process.env.FORWARD_HEADERS === 'TRUE' || false;
 export const getCustomHeaders = () =>
