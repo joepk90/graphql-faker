@@ -1,10 +1,9 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 
-import { mkdirSync } from 'fs';
 import { Source, GraphQLSchema, printSchema } from 'graphql';
 import {
+  getFile,
   existsSync,
   schemaDir,
   prettyPrintValidationErrors,
@@ -21,12 +20,6 @@ import {
   buildWithFakeDefinitions,
   ValidationErrors,
 } from 'src/utils/fake_definition';
-
-export const createDirIfNonExistent = (dir: string) => {
-  if (!existsSync(dir)) {
-    mkdirSync(dir);
-  }
-};
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
@@ -52,10 +45,6 @@ export const getCustomSchemaFilePath = () => {
 const getCustomerSchemaAndConvertToSource = () => {
   const filePath = getCustomSchemaFilePath();
   return existsSync(filePath) && readSDL(filePath);
-};
-
-const getFile = (filepath: string) => {
-  return fs.readFileSync(filepath, 'utf-8');
 };
 
 export const getUserSDL = (fileName: string) => {
