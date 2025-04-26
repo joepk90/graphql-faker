@@ -17,5 +17,6 @@ export const getHeadersToForward = () =>
 // allows a custom headers to be injected from a .headers.json file in the root directory
 export const allowCustomHeaders = () => process.env.CUSTOM_HEADERS || false;
 
+// allowed hosts config is required for cors, so that the client (editor) can make requests
 export const getAllowedHosts = () =>
   process.env.ALLOWED_HOSTS?.split(',') || [defaultAllowedHost];
