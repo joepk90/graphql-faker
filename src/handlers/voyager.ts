@@ -6,7 +6,6 @@ import { projectRoot, getCustomHeaders } from 'src/utils';
 const voyagerPath = 'node_modules/graphql-voyager/dist/voyager.worker.js';
 
 const getHeaders = () => {
-  console.log('test');
   const customHeaders = getCustomHeaders();
   return JSON.stringify(customHeaders);
 };
