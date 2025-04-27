@@ -127,7 +127,6 @@ function proxyResponse(response: GraphQLResponse, args: ExecutionArgs) {
   return execute({ ...args, rootValue });
 }
 
-// @ts-ignore
 function pathSet(rootObject, path, value) {
   let currentObject = rootObject;
 
@@ -169,7 +168,6 @@ function stripExtensionFields(schema: GraphQLSchema, operationAST: ASTNode) {
         const fieldDef = typeInfo.getFieldDef();
         if (
           fieldDef.name.startsWith('__') ||
-          // @ts-ignore
           fieldDef.extensions['isExtensionField'] === true
         ) {
           return null;

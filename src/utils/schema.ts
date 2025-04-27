@@ -60,7 +60,6 @@ export const prepareDefaultSDL = () => {
   return new Source(getUserSDL(defaultSchemaFileName), fileName);
 };
 
-// @ts-ignore
 export const prepareDefaultExtendedSDL = (schema) => {
   const fileName = getSchemaFileNameWithRemoteSchemaExt();
   let body = getUserSDL(extendedSchemaFileName);
@@ -72,7 +71,6 @@ export const prepareDefaultExtendedSDL = (schema) => {
   return new Source(body, fileName);
 };
 
-// @ts-ignore
 export const getDynamicUserSDLTest = (remoteSchema) => {
   if (!remoteSchema) {
     return prepareDefaultSDL();
@@ -81,7 +79,6 @@ export const getDynamicUserSDLTest = (remoteSchema) => {
   return prepareDefaultExtendedSDL(remoteSchema);
 };
 
-// @ts-ignore
 export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
   const userSDL = getCustomerSchemaAndConvertToSource();
   if (userSDL) {
@@ -91,7 +88,6 @@ export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
   return getDynamicUserSDLTest(remoteSchema);
 };
 
-// @ts-ignore
 export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
   // apply faker defintions
   try {
@@ -115,13 +111,11 @@ export const prepareRemoteSchema = async () => {
   try {
     return await getRemoteSchema(extendURL);
   } catch (error) {
-    // @ts-ignore
     console.log(chalk.red(error.stack));
     process.exit(1);
   }
 };
 
-// @ts-ignore
 export const prepareRemoteSDL = (remoteSDL) => {
   if (!remoteSDL) {
     return;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { allFakers, faker } from '@faker-js/faker';
 import moment from 'moment';
 
