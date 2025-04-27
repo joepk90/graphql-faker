@@ -5,7 +5,7 @@
     "emitDecoratorMetadata": true,
     "module": "commonjs",
     "target": "ESNext",
-    "noImplicitAny": false,
+    "noImplicitAny": false, // TODO update to true (update missing types)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
