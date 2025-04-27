@@ -4,10 +4,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "commonjs",
-    "target": "es2017",
-    "noImplicitAny": false,
+    "target": "ESNext",
+    "noImplicitAny": false, // TODO update to true (update missing types)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "esModuleInterop": true,
     "pretty": true,
     "sourceMap": true,
     "moduleResolution": "node",
@@ -20,6 +21,6 @@
     },
   },
   "compileOnSave": false,
-  "exclude": ["src/editor", "node_modules", ".tmp", "lib"],
+  "exclude": ["src/editor", "node_modules"],
   "include": ["./src"]
 }

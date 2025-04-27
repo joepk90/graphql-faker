@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import chalk from 'chalk';
 import { ValidationErrors } from 'src/utils/fake_definition';
 
 // maybe this should be kept in the schema file

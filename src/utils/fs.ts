@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 import { mkdirSync } from 'fs';
 
 // TODO could replace with: pkg-dir, app-root-path, find-package-json?
@@ -13,7 +13,7 @@ export function existsSync(filePath: string): boolean {
   try {
     fs.statSync(filePath);
   } catch (err) {
-    if (err.code == 'ENOENT') return false;
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return false;
   }
   return true;
 }

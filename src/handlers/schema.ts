@@ -1,5 +1,6 @@
-import * as chalk from 'chalk';
-import * as fs from 'fs';
+import chalk from 'chalk';
+import fs from 'fs';
+import { Request, Response } from 'express';
 
 import {
   getUserSDLWithDefaultSDLFallback,
@@ -12,7 +13,7 @@ import {
 export const schemaHandlerPost = () => {
   const fileName = getSchemaFileName();
 
-  return (req, res) => {
+  return (req: Request, res: Response) => {
     try {
       const customSchemaFilePath = getCustomSchemaFilePath();
       fs.writeFileSync(customSchemaFilePath, req.body);
@@ -25,14 +26,18 @@ export const schemaHandlerPost = () => {
       );
 
       res.status(200).send('ok');
-    } catch (err) {
-      res.status(500).send(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        res.status(500).send(err.message);
+      } else {
+        res.status(500).send('An unknown error occurred');
+      }
     }
   };
 };
 
 export const schemaHandlerGet = () => {
-  return async (_, res) => {
+  return async (_req: Request, res: Response) => {
     const remoteSchema = await prepareRemoteSchema();
     const userSDL = getUserSDLWithDefaultSDLFallback(remoteSchema);
     const remoteSDL = prepareRemoteSDL(remoteSchema);

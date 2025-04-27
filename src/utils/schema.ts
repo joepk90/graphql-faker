@@ -1,5 +1,5 @@
-import * as path from 'path';
-import * as chalk from 'chalk';
+import path from 'path';
+import chalk from 'chalk';
 
 import { Source, GraphQLSchema, printSchema } from 'graphql';
 import {

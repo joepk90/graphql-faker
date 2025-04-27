@@ -1,5 +1,5 @@
-import * as express from 'express';
-import * as path from 'path';
+import express from 'express';
+import path from 'path';
 import { express as graphqlVoyagerMiddleware } from 'graphql-voyager/middleware';
 import { projectRoot, getCustomHeaders } from 'src/utils';
 
