@@ -22,7 +22,6 @@ import {
   getCustomHeaders,
   mergeObjectsIgnoreCase,
   copyHeadersFromRequest,
-  GraphQLRequestVariables,
   GraphQLResponse,
 } from 'src/utils';
 
@@ -38,7 +37,6 @@ import {
 
 const getHeaders = (requestHeaders: IncomingHttpHeaders) => {
   const forwardHeaders = getHeadersToForward();
-
   const customHeaders = getCustomHeaders();
 
   const headersToForward = copyHeadersFromRequest(

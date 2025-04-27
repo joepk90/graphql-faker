@@ -7,7 +7,7 @@ import { getAllowedHosts, getPort } from 'src/utils';
 
 export const routeDebuggingMiddleware = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   console.log('Request URL:', req.url);
