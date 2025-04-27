@@ -1,25 +1,23 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "module": "commonjs",
-    "target": "es2017",
-    "noImplicitAny": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "pretty": true,
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "lib": ["es2017"],
-    "outDir": "dist",
+    "target": "ESNext", // Keep it ESNext for modern JavaScript features
+    "module": "commonjs", // Output in CommonJS format
+    "moduleResolution": "node", // Resolve modules like Node.js
+    "esModuleInterop": true,       // Ensures compatibility with ES modules
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,                // Enable strict type-checking options
+    "skipLibCheck": true,          // Skip library checks for faster builds
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "lib": ["ES2022"], 
     "rootDir": "src",
-    "baseUrl": ".",         
+    "baseUrl": "./src",
+    "outDir": "dist",
     "paths": {
-      "src/*": ["src/*"]
-    },
+      "src/*": ["*"]
+    }
   },
-  "compileOnSave": false,
-  "exclude": ["src/editor", "node_modules", ".tmp", "lib"],
-  "include": ["./src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { allFakers, faker } from '@faker-js/faker';
-import * as moment from 'moment';
+import moment from 'moment';
 
 /**
  * Faker Helper Functions

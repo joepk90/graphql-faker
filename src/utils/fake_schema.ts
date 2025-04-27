@@ -1,4 +1,5 @@
-import * as assert from 'assert';
+// @ts-nocheck
+import assert from 'assert';
 import {
   defaultFieldResolver,
   defaultTypeResolver,

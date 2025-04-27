@@ -2,6 +2,7 @@ import {
   execute,
   ExecutionArgs,
   GraphQLError,
+  GraphQLSchema,
   isAbstractType,
   Kind,
   print,
@@ -9,9 +10,11 @@ import {
   TypeInfo,
   visit,
   visitWithTypeInfo,
+  ASTNode,
+  SelectionSetNode,
 } from 'graphql';
 import { IncomingMessage, IncomingHttpHeaders } from 'http';
-
+import { Headers } from 'node-fetch';
 import {
   graphqlRequest,
   getHeadersToForward,
@@ -19,6 +22,8 @@ import {
   getCustomHeaders,
   mergeObjectsIgnoreCase,
   copyHeadersFromRequest,
+  GraphQLRequestVariables,
+  GraphQLResponse,
 } from 'src/utils';
 
 /**
@@ -33,6 +38,7 @@ import {
 
 const getHeaders = (requestHeaders: IncomingHttpHeaders) => {
   const forwardHeaders = getHeadersToForward();
+
   const customHeaders = getCustomHeaders();
 
   const headersToForward = copyHeadersFromRequest(
@@ -40,7 +46,10 @@ const getHeaders = (requestHeaders: IncomingHttpHeaders) => {
     forwardHeaders,
   );
 
-  return mergeObjectsIgnoreCase(headersToForward, customHeaders);
+  return mergeObjectsIgnoreCase(
+    headersToForward,
+    customHeaders as Headers,
+  ) as Headers;
 };
 
 export const getProxyExecuteFn = async () => {
@@ -53,7 +62,11 @@ export const getProxyExecuteFn = async () => {
     const { schema, document, contextValue, operationName } = args;
 
     const request = contextValue as IncomingMessage;
-    const headers = getHeaders(request.headers);
+
+    let headers: Headers = new Headers();
+    if (request?.headers) {
+      headers = getHeaders(request.headers) as Headers;
+    }
 
     // test validation
     // try {
@@ -74,16 +87,16 @@ export const getProxyExecuteFn = async () => {
       extendURL,
       print(operationAST),
       headers,
-      args.variableValues,
+      args.variableValues as ExecutionArgs,
       operationName,
     );
     return await proxyResponse(response, args);
   };
 };
 
-function proxyResponse(response, args) {
+function proxyResponse(response: GraphQLResponse, args: ExecutionArgs) {
   const rootValue = response.data || {};
-  const globalErrors = [];
+  const globalErrors: GraphQLError[] = [];
 
   for (const error of response.errors || []) {
     const { message, path, extensions } = error;
@@ -114,6 +127,7 @@ function proxyResponse(response, args) {
   return execute({ ...args, rootValue });
 }
 
+// @ts-ignore
 function pathSet(rootObject, path, value) {
   let currentObject = rootObject;
 
@@ -129,7 +143,7 @@ function pathSet(rootObject, path, value) {
   currentObject[lastKey] = value;
 }
 
-function injectTypename(node) {
+function injectTypename(node: SelectionSetNode) {
   return {
     ...node,
     selections: [
@@ -145,7 +159,7 @@ function injectTypename(node) {
   };
 }
 
-function stripExtensionFields(schema, operationAST) {
+function stripExtensionFields(schema: GraphQLSchema, operationAST: ASTNode) {
   const typeInfo = new TypeInfo(schema);
 
   return visit(
@@ -155,6 +169,7 @@ function stripExtensionFields(schema, operationAST) {
         const fieldDef = typeInfo.getFieldDef();
         if (
           fieldDef.name.startsWith('__') ||
+          // @ts-ignore
           fieldDef.extensions['isExtensionField'] === true
         ) {
           return null;
@@ -171,7 +186,7 @@ function stripExtensionFields(schema, operationAST) {
   );
 }
 
-function removeUnusedVariables(documentAST) {
+function removeUnusedVariables(documentAST: ASTNode) {
   const seenVariables = Object.create(null);
 
   visit(documentAST, {

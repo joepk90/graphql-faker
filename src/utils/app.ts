@@ -1,9 +1,15 @@
-import * as chalk from 'chalk';
-import * as cors from 'cors';
+import chalk from 'chalk';
+import cors from 'cors';
+import { Server } from 'http';
+import { Request, Response, NextFunction } from 'express';
 
 import { getAllowedHosts, getPort } from 'src/utils';
 
-export const routeDebuggingMiddleware = (req, _, next) => {
+export const routeDebuggingMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   console.log('Request URL:', req.url);
   console.log('Request Method:', req.method);
   console.log('Request Headers:', req.headers);
@@ -21,7 +27,7 @@ export const corsMiddleware = () => {
   return cors(getCorsOptions());
 };
 
-export const shutdown = (server, input) => {
+export const shutdown = (server: Server, input: string) => {
   console.log(`Received ${input}. Gracefully shutting down.`);
   server.close();
   process.exit(0);

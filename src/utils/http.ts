@@ -1,4 +1,5 @@
 import { IncomingHttpHeaders } from 'http';
+import { Headers } from 'node-fetch';
 import {
   projectRoot,
   getJsonFileIfExists,
@@ -8,8 +9,9 @@ import {
 } from 'src/utils';
 
 const validateHeaders = (headers: Object) => {
+  const emptyHeaders = new Headers();
   if (!headers || typeof headers !== 'object') {
-    return null;
+    return emptyHeaders;
   }
 
   const result = Object.entries(headers).every(
@@ -17,17 +19,17 @@ const validateHeaders = (headers: Object) => {
   );
 
   if (!result) {
-    return null;
+    return emptyHeaders;
   }
 
-  return headers as Record<string, string>;
+  return headers as Headers;
 };
 
-export const getCustomHeaders = (): Record<string, string> | null => {
+export const getCustomHeaders = (): Headers => {
   const useCustomHeaders = allowCustomHeaders();
 
   if (!useCustomHeaders) {
-    return null;
+    return new Headers();
   }
 
   const customerHeadersFilePath = `${projectRoot}/${customHeadersDirName}/${customHeadersFileName}`;

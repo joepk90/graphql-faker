@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { allFakers } from '@faker-js/faker';
 import {
   buildASTSchema,
