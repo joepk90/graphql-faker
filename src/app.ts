@@ -12,6 +12,7 @@ import {
   routeDebuggingMiddleware,
   createDirIfNonExistent,
   customSchemaExtensionsDirName,
+  handleAppCors,
 } from 'src/utils';
 
 import {
@@ -24,6 +25,7 @@ import {
 
 export const runServer = async () => {
   const app = express();
+  app.use(handleAppCors());
 
   // TODO make dependant on if SCHEMA_FILE_NAME has been provided + move to util function
   createDirIfNonExistent(customSchemaExtensionsDirName);
