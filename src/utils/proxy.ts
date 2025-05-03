@@ -30,7 +30,7 @@ import {
  * - the headers from the request, using specified headers in the FORWARD_HEADERS env var
  * - get headers specified in the .headers.json file
  *
- * it then merges both sets of headers, prioritising the headers from the .headers.json file
+ * it then merges both sets of headers, prioritising the headers from the request
  * @param requestHeaders
  * @returns
  */
@@ -44,10 +44,7 @@ const getHeaders = (requestHeaders: IncomingHttpHeaders) => {
     forwardHeaders,
   );
 
-  return mergeObjectsIgnoreCase(
-    headersToForward,
-    customHeaders as Headers,
-  ) as Headers;
+  return mergeObjectsIgnoreCase(customHeaders, headersToForward) as Headers;
 };
 
 export const getProxyExecuteFn = async () => {
