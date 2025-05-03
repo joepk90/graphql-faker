@@ -54,7 +54,7 @@ export const getCorsOptions = (): CorsOptions | undefined => {
   const allowedHosts = getAllowedHosts();
 
   return {
-    origin: allowedHosts.join(','),
+    origin: allowedHosts,
     credentials: true,
   };
 
