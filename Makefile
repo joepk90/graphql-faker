@@ -10,19 +10,19 @@ docker-build:
 
 docker-run:
 	docker run -it \
-	-p 9092:9092 \
+	-p 3000:3000 \
 	-e SCHEMA_FILE_NAME=schema_extension \
-	-e ALLOWED_HOSTS=http://localhost:8080 \
-	-e PORT=9092 \
+	-e ALLOWED_HOSTS=http://localhost:5173 \
+	-e SERVER_PORT=3000 \
 	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \
 	${DOCKER_IMAGE}
 
 docker-debug:
 	docker run -it \
-	-p 9092:9092 \
+	-p 3000:3000 \
 	-e SCHEMA_FILE_NAME=schema_extension \
-	-e ALLOWED_HOSTS=http://localhost:8080 \
-	-e PORT=9092 \
+	-e ALLOWED_HOSTS=http://localhost:5173 \
+	-e SERVER_PORT=3000 \
 	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \
 	${DOCKER_IMAGE} /bin/bash
 
@@ -36,10 +36,10 @@ docker-push:
 # custom
 docker-run-with-custom-headers:
 	docker run -it \
-	-p 9092:9092 \
+	-p 3000:3000 \
 	-e SCHEMA_FILE_NAME=schema_extension \
-	-e ALLOWED_HOSTS=http://localhost:8080 \
-	-e PORT=9092 \
+	-e ALLOWED_HOSTS=http://localhost:5173 \
+	-e SERVER_PORT=3000 \
 	-e EXTEND_URL=https://swapi-graphql.netlify.app/graphql \
 	-e CUSTOM_HEADERS=TRUE \
 	-v $(PWD)/.headers:/app/.headers \

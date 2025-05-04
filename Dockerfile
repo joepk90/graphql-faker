@@ -16,6 +16,6 @@ COPY ./tsconfig.json ./tsconfig.json
 
 RUN npm run build
 
-EXPOSE 9092
+EXPOSE 3000
 
 CMD ["npm", "run", "serve:prod"]
