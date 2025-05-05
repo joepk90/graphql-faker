@@ -246,6 +246,7 @@ export function fakeValue(type: string, options: FakeOptions, locale?: string) {
     return fakeGeneratorField();
   }
   const callArgs = fakeGeneratorField.args.map((name: string) => options[name]);
+
   // @ts-ignore
   return fakeGeneratorField.func(...callArgs);
 }

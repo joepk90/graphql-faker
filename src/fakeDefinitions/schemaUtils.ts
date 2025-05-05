@@ -35,8 +35,8 @@ const fakeDefinitionsSet = new Set(
 
 const schemaWithOnlyFakedDefinitions = buildASTSchema(fakeDefinitionAST);
 // FIXME: mark it as valid to be able to run `validate`
-// @ts-ignore
-schemaWithOnlyFakedDefinitions['__validationErrors'] = [];
+
+(schemaWithOnlyFakedDefinitions as any)['__validationErrors'] = [];
 
 // this function might be a duplicate or unneccesary - TODO move to util file
 function schemaToDocumentNode(schema: GraphQLSchema): DocumentNode {

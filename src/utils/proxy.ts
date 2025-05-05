@@ -91,7 +91,7 @@ export const getProxyExecuteFn = async () => {
 };
 
 function proxyResponse(response: GraphQLResponse, args: ExecutionArgs) {
-  const rootValue = response.data || {};
+  const rootValue: GraphQLSchema = response.data || {};
   const globalErrors: GraphQLError[] = [];
 
   for (const error of response.errors || []) {
@@ -123,9 +123,12 @@ function proxyResponse(response: GraphQLResponse, args: ExecutionArgs) {
   return execute({ ...args, rootValue });
 }
 
-// @ts-ignore
-function pathSet(rootObject, path, value) {
-  let currentObject = rootObject;
+function pathSet(
+  rootObject: Record<string, any>,
+  path: string[],
+  value: GraphQLError,
+) {
+  let currentObject: Record<string, any> = rootObject;
 
   const basePath = [...path];
   const lastKey = basePath.pop();
@@ -136,7 +139,9 @@ function pathSet(rootObject, path, value) {
     currentObject = currentObject[key];
   }
 
-  currentObject[lastKey] = value;
+  if (lastKey !== undefined) {
+    currentObject[lastKey] = value;
+  }
 }
 
 function injectTypename(node: SelectionSetNode) {
