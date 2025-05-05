@@ -27,7 +27,7 @@ const isWildcardUsed = () => {
   return false;
 };
 
-export const handleAppCors = (): RequestHandler | undefined => {
+export const handleAppCors = (): RequestHandler => {
   if (isWildcardUsed()) {
     return cors(); // Same as app.use(cors()) — default permissive behavior
   }
