@@ -19,7 +19,7 @@ import {
 import {
   buildWithFakeDefinitions,
   ValidationErrors,
-} from 'src/utils/fake_definition';
+} from 'src/fakeDefinitions';
 
 // TODO review fs.readFileSync usage - can this be abstracted?
 
