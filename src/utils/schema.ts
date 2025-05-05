@@ -60,18 +60,24 @@ export const prepareDefaultSDL = () => {
   return new Source(getUserSDL(defaultSchemaFileName), fileName);
 };
 
-export const prepareDefaultExtendedSDL = (schema) => {
+export const prepareDefaultExtendedSDL = (schema: GraphQLSchema) => {
   const fileName = getSchemaFileNameWithRemoteSchemaExt();
   let body = getUserSDL(extendedSchemaFileName);
 
   // TODO: CONVERT UTIL FUNCTION!
-  const rootTypeName = schema.getQueryType().name;
+  const queryType = schema.getQueryType();
+  if (!queryType) {
+    throw new Error('Query type is not defined in the schema.');
+  }
+  const rootTypeName = queryType.name;
   body = body.replace('___RootTypeName___', rootTypeName);
 
   return new Source(body, fileName);
 };
 
-export const getDynamicUserSDLTest = (remoteSchema) => {
+export const getDynamicUserSDLTest = (
+  remoteSchema: GraphQLSchema | undefined,
+) => {
   if (!remoteSchema) {
     return prepareDefaultSDL();
   }
@@ -79,7 +85,9 @@ export const getDynamicUserSDLTest = (remoteSchema) => {
   return prepareDefaultExtendedSDL(remoteSchema);
 };
 
-export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
+export const getUserSDLWithDefaultSDLFallback = (
+  remoteSchema: GraphQLSchema | undefined,
+) => {
   const userSDL = getCustomerSchemaAndConvertToSource();
   if (userSDL) {
     return userSDL;
@@ -88,18 +96,37 @@ export const getUserSDLWithDefaultSDLFallback = (remoteSchema) => {
   return getDynamicUserSDLTest(remoteSchema);
 };
 
-export const getSchema = (userSDL, remoteSDL): GraphQLSchema => {
-  // apply faker defintions
+// build the schema with just the user schema, or both the user schema and remote schema
+export const buildSchemaWithFakeDefsFromSources = (
+  userSDL: Source,
+  remoteSDL?: Source,
+) => {
+  return remoteSDL
+    ? buildWithFakeDefinitions(remoteSDL, userSDL)
+    : buildWithFakeDefinitions(userSDL);
+};
+
+export const getSchema = async (
+  userSDL: Source,
+  remoteSDL: Source | undefined,
+): Promise<GraphQLSchema> => {
+  let schema: GraphQLSchema | undefined = undefined;
+
+  // // apply faker defintions
   try {
-    return remoteSDL
-      ? buildWithFakeDefinitions(remoteSDL, userSDL)
-      : buildWithFakeDefinitions(userSDL);
+    schema = await buildSchemaWithFakeDefsFromSources(userSDL, remoteSDL);
   } catch (error) {
     if (error instanceof ValidationErrors) {
       prettyPrintValidationErrors(error);
       process.exit(1);
     }
   }
+
+  if (!schema) {
+    throw new Error('Schema could not be built.');
+  }
+
+  return schema;
 };
 
 export const prepareRemoteSchema = async () => {
@@ -110,13 +137,16 @@ export const prepareRemoteSchema = async () => {
   }
   try {
     return await getRemoteSchema(extendURL);
-  } catch (error) {
-    console.log(chalk.red(error.stack));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(chalk.red(error.stack));
+    }
+    console.log(chalk.red(error));
     process.exit(1);
   }
 };
 
-export const prepareRemoteSDL = (remoteSDL) => {
+export const prepareRemoteSDL = (remoteSDL: GraphQLSchema | undefined) => {
   if (!remoteSDL) {
     return;
   }
