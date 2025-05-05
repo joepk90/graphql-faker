@@ -188,6 +188,10 @@ function fakeLeafValueCB(type: GraphQLLeafType) {
     return getRandomItem(values);
   }
 
+  // @ts-ignore
+  // original setup
+  // const faker = stdScalarFakers[type.name];
+
   const faker = getFakerByType(stdScalarFakers, type);
   if (faker) return faker();
 
