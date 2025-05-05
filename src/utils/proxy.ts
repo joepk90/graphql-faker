@@ -12,6 +12,7 @@ import {
   visitWithTypeInfo,
   ASTNode,
   SelectionSetNode,
+  GraphQLField,
 } from 'graphql';
 import { IncomingMessage, IncomingHttpHeaders } from 'http';
 import { Headers } from 'node-fetch';
@@ -122,6 +123,7 @@ function proxyResponse(response: GraphQLResponse, args: ExecutionArgs) {
   return execute({ ...args, rootValue });
 }
 
+// @ts-ignore
 function pathSet(rootObject, path, value) {
   let currentObject = rootObject;
 
@@ -153,6 +155,26 @@ function injectTypename(node: SelectionSetNode) {
   };
 }
 
+const hasExtensionField = (
+  fieldDef: GraphQLField<
+    any,
+    any,
+    {
+      [key: string]: any;
+    }
+  >,
+) => {
+  const startsWith___ = fieldDef.name.startsWith('__');
+  const hasExtensionField =
+    fieldDef?.extensions && fieldDef.extensions['isExtensionField'] === true;
+
+  if (startsWith___ || hasExtensionField) {
+    return true;
+  }
+
+  return false;
+};
+
 function stripExtensionFields(schema: GraphQLSchema, operationAST: ASTNode) {
   const typeInfo = new TypeInfo(schema);
 
@@ -161,10 +183,8 @@ function stripExtensionFields(schema: GraphQLSchema, operationAST: ASTNode) {
     visitWithTypeInfo(typeInfo, {
       [Kind.FIELD]: () => {
         const fieldDef = typeInfo.getFieldDef();
-        if (
-          fieldDef.name.startsWith('__') ||
-          fieldDef.extensions['isExtensionField'] === true
-        ) {
+        const fieldDefHasExtension = hasExtensionField(fieldDef);
+        if (fieldDefHasExtension) {
           return null;
         }
       },
