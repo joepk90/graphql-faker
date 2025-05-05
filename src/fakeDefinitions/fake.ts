@@ -1,5 +1,7 @@
-import { allFakers, faker } from '@faker-js/faker';
+import { allFakers, Faker, faker } from '@faker-js/faker';
 import moment from 'moment';
+
+import { FakeOptions, ExtendedFaker } from 'src/fakeDefinitions';
 
 /**
  * Faker Helper Functions
@@ -26,7 +28,7 @@ function toBase64(str: string) {
   return Buffer.from(str).toString('base64');
 }
 
-function fakeFunctions(fakerInstance: typeof faker) {
+function fakeFunctions(fakerInstance: Faker): ExtendedFaker {
   allFakers;
   return {
     // Address section
@@ -37,7 +39,7 @@ function fakeFunctions(fakerInstance: typeof faker) {
     streetName: () => fakerInstance.location.street(),
     streetAddress: {
       args: ['useFullAddress'],
-      func: (useFullAddress) =>
+      func: (useFullAddress: boolean) =>
         fakerInstance.location.streetAddress(useFullAddress),
     },
     // Skipped: faker.address.streetSuffix
@@ -57,7 +59,8 @@ function fakeFunctions(fakerInstance: typeof faker) {
     productName: () => fakerInstance.commerce.productName(),
     money: {
       args: ['minMoney', 'maxMoney', 'decimalPlaces'],
-      func: (min, max, dec) => fakerInstance.commerce.price({ min, max, dec }),
+      func: (min: number, max: number, dec: number) =>
+        fakerInstance.commerce.price({ min, max, dec }),
     },
     // Skipped: faker.commerce.productAdjective
     productMaterial: () => fakerInstance.commerce.productMaterial(),
@@ -85,24 +88,28 @@ function fakeFunctions(fakerInstance: typeof faker) {
     // Date section
     date: {
       args: ['dateFormat', 'dateFrom', 'dateTo'],
-      func: (dateFormat, dateFrom, dateTo) =>
+      func: (
+        dateFormat: string,
+        dateFrom: string | Date | number,
+        dateTo: string | Date | number,
+      ) =>
         moment(fakerInstance.date.between({ from: dateFrom, to: dateTo }))
           .format(dateFormat)
           .toString(),
     },
     pastDate: {
       args: ['dateFormat'],
-      func: (dateFormat) =>
+      func: (dateFormat: string) =>
         moment(fakerInstance.date.past()).format(dateFormat),
     },
     futureDate: {
       args: ['dateFormat'],
-      func: (dateFormat) =>
+      func: (dateFormat: string) =>
         moment(fakerInstance.date.future()).format(dateFormat),
     },
     recentDate: {
       args: ['dateFormat'],
-      func: (dateFormat) =>
+      func: (dateFormat: string) =>
         moment(fakerInstance.date.recent()).format(dateFormat),
     },
 
@@ -123,8 +130,12 @@ function fakeFunctions(fakerInstance: typeof faker) {
 
     // Image section
     imageUrl: {
-      args: ['imageSize', 'imageKeywords', 'randomizeImageUrl'],
-      func: (size, keywords, randomize) => {
+      args: ['imageSize', 'imageKeywords', 'randomizeImageUrl'] as const,
+      func: (
+        size: { width: number; height: number } | null,
+        keywords: string[] | null,
+        randomize: boolean | null,
+      ): string => {
         let url = 'https://source.unsplash.com/random/';
 
         if (size != null) {
@@ -147,7 +158,7 @@ function fakeFunctions(fakerInstance: typeof faker) {
     avatarUrl: () => fakerInstance.internet.avatar(),
     email: {
       args: ['emailProvider'],
-      func: (provider) => fakerInstance.internet.email({ provider }),
+      func: (provider: string) => fakerInstance.internet.email({ provider }),
     },
     url: () => fakerInstance.internet.url(),
     domainName: () => fakerInstance.internet.domainName(),
@@ -156,20 +167,29 @@ function fakeFunctions(fakerInstance: typeof faker) {
     userAgent: () => fakerInstance.internet.userAgent(),
     colorHex: {
       args: ['baseColor'],
-      func: ({ redBase, greenBase, blueBase }) => {
+      func: ({
+        redBase,
+        greenBase,
+        blueBase,
+      }: {
+        redBase: number;
+        greenBase: number;
+        blueBase: number;
+      }) => {
         return fakerInstance.internet.color({ redBase, greenBase, blueBase });
       },
     },
     macAddress: () => fakerInstance.internet.mac(),
     password: {
       args: ['passwordLength'],
-      func: (len) => fakerInstance.internet.password(len),
+      func: (len: number) => fakerInstance.internet.password(len),
     },
 
     // Lorem section
     lorem: {
       args: ['loremSize'],
-      func: (size) => fakerInstance.lorem[size || 'paragraphs'](),
+      func: (size: keyof Faker['lorem'] = 'paragraphs') =>
+        fakerInstance.lorem[size](),
     },
 
     // Name section
@@ -186,7 +206,7 @@ function fakeFunctions(fakerInstance: typeof faker) {
     // Random section
     number: {
       args: ['minNumber', 'maxNumber', 'precisionNumber'],
-      func: (min, max, precision) =>
+      func: (min: number, max: number, precision: number) =>
         fakerInstance.number.float({ min, max, precision }),
     },
     uuid: () => fakerInstance.string.uuid(),
@@ -206,14 +226,22 @@ function fakeFunctions(fakerInstance: typeof faker) {
     semver: () => fakerInstance.system.semver(),
   };
 }
+// FakeArgs;
+export function fakeValue(type: string, options: FakeOptions, locale?: string) {
+  const fakerInstance =
+    locale != null
+      ? allFakers[locale as keyof typeof allFakers]
+      : (faker as Faker);
+  const fakeFunctionsMap = fakeFunctions(fakerInstance);
+  const fakeGeneratorField = fakeFunctionsMap[type as keyof ExtendedFaker];
 
-export function fakeValue(type, options?, locale?) {
-  const fakerInstance = locale != null ? allFakers[locale] : faker;
-  const fakeGenerator = fakeFunctions(fakerInstance)[type];
+  // const fakeFunctionsMap = fakeFunctions(fakerInstance);
+  // const fakeGenerator = fakeFunctionsMap[type as keyof typeof fakeFunctionsMap];
 
-  if (typeof fakeGenerator === 'function') {
-    return fakeGenerator();
+  if (typeof fakeGeneratorField === 'function') {
+    return fakeGeneratorField();
   }
-  const callArgs = fakeGenerator.args.map((name) => options[name]);
-  return fakeGenerator.func(...callArgs);
+  const callArgs = fakeGeneratorField.args.map((name: string) => options[name]);
+  // @ts-ignore
+  return fakeGeneratorField.func(...callArgs);
 }
