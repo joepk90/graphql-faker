@@ -20,6 +20,14 @@ export interface DirectiveArgs {
   listLength?: ListLengthArgs;
 }
 
+export interface StdScalarFakersInterface {
+  Int: () => number;
+  Float: () => number;
+  String: () => string;
+  Boolean: () => boolean;
+  ID: () => string;
+}
+
 import { Faker } from '@faker-js/faker';
 
 export interface ExtendedFaker {

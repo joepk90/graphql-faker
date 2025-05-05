@@ -1,7 +1,11 @@
 import { allFakers, Faker, faker } from '@faker-js/faker';
 import moment from 'moment';
 
-import { FakeOptions, ExtendedFaker } from 'src/fakeDefinitions';
+import {
+  FakeOptions,
+  ExtendedFaker,
+  StdScalarFakersInterface,
+} from 'src/fakeDefinitions';
 
 /**
  * Faker Helper Functions
@@ -16,7 +20,7 @@ export function getRandomItem<T>(array: ReadonlyArray<T>): T {
   return array[getRandomInt(0, array.length - 1)];
 }
 
-export const stdScalarFakers = {
+export const stdScalarFakers: StdScalarFakersInterface = {
   Int: () => faker.number.int({ min: 0, max: 99999 }),
   Float: () => faker.number.float({ min: 0, max: 99999, precision: 0.01 }),
   String: () => 'string',

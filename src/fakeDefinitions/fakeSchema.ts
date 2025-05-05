@@ -1,4 +1,3 @@
-// @ts-nocheck
 import assert from 'assert';
 import {
   defaultFieldResolver,
@@ -14,6 +13,9 @@ import {
   isLeafType,
   isListType,
   isNonNullType,
+  GraphQLField,
+  GraphQLDirective,
+  GraphQLNamedType,
 } from 'graphql';
 
 import {
@@ -21,14 +23,10 @@ import {
   getRandomInt,
   getRandomItem,
   stdScalarFakers,
+  StdScalarFakersInterface,
 } from 'src/fakeDefinitions';
 
-import {
-  FakeArgs,
-  ExamplesArgs,
-  ListLengthArgs,
-  DirectiveArgs,
-} from 'src/fakeDefinitions';
+import { FakeArgs, ExamplesArgs, ListLengthArgs } from 'src/fakeDefinitions';
 
 export const fakeTypeResolver: GraphQLTypeResolver<unknown, unknown> = async (
   value,
@@ -60,12 +58,13 @@ export const fakeFieldResolver: GraphQLFieldResolver<unknown, unknown> = async (
   const fieldDef = parentType.getFields()[fieldName];
 
   let resolved = await defaultFieldResolver(source, args, context, info);
+
   if (resolved === undefined && source && typeof source === 'object') {
-    resolved = source[info.path.key]; // alias value
+    resolved = (source as Record<string | number, unknown>)[info.path.key];
   }
 
   if (resolved === undefined) {
-    resolved = fakeValueOfType(fieldDef.type);
+    resolved = fakeValueOfType(fieldDef.type as GraphQLLeafType);
   }
 
   if (resolved instanceof Error) {
@@ -86,7 +85,9 @@ export const fakeFieldResolver: GraphQLFieldResolver<unknown, unknown> = async (
 
   return resolved;
 
-  function fakeValueOfType(type) {
+  // fakeValueOfType(type: GraphQLLeafType | GraphQLTypeResolver<unknown, unknown>): unknown
+
+  function fakeValueOfType(type: GraphQLLeafType): unknown {
     if (isNonNullType(type)) {
       return fakeValueOfType(type.ofType);
     }
@@ -112,7 +113,7 @@ export const fakeFieldResolver: GraphQLFieldResolver<unknown, unknown> = async (
       // TODO: error on fake directive
       const __typename: string = isAbstractType(type)
         ? getRandomItem(schema.getPossibleTypes(type)).name
-        : type.name;
+        : (type as GraphQLLeafType).name;
 
       return {
         __typename,
@@ -121,23 +122,64 @@ export const fakeFieldResolver: GraphQLFieldResolver<unknown, unknown> = async (
     }
   }
 
-  function getFakeValueCB(object) {
+  function getFakeValueCB(
+    object:
+      | GraphQLLeafType
+      | GraphQLField<
+          any,
+          any,
+          {
+            [key: string]: any;
+          }
+        >,
+  ) {
     const fakeDirective = schema.getDirective('fake');
     const args = getDirectiveArgs(fakeDirective, object) as FakeArgs;
     return args && (() => fakeValue(args.type, args.options, args.locale));
   }
 
-  function getExampleValueCB(object) {
+  function getExampleValueCB(
+    object:
+      | GraphQLLeafType
+      | GraphQLField<
+          any,
+          any,
+          {
+            [key: string]: any;
+          }
+        >,
+  ) {
     const examplesDirective = schema.getDirective('examples');
     const args = getDirectiveArgs(examplesDirective, object) as ExamplesArgs;
     return args && (() => getRandomItem(args.values));
   }
 
-  function getListLength(object) {
+  function getListLength(
+    object:
+      | GraphQLLeafType
+      | GraphQLField<
+          any,
+          any,
+          {
+            [key: string]: any;
+          }
+        >,
+  ) {
     const listLength = schema.getDirective('listLength');
     const args = getDirectiveArgs(listLength, object) as ListLengthArgs;
     return args ? getRandomInt(args.min, args.max) : getRandomInt(2, 4);
   }
+};
+
+const getFakerByType = (
+  stdScalarFakers: StdScalarFakersInterface,
+  type: GraphQLLeafType,
+) => {
+  return (
+    Object.keys(stdScalarFakers) as (keyof typeof stdScalarFakers)[]
+  ).includes(type.name as keyof typeof stdScalarFakers)
+    ? stdScalarFakers[type.name as keyof typeof stdScalarFakers]
+    : undefined;
 };
 
 function fakeLeafValueCB(type: GraphQLLeafType) {
@@ -146,22 +188,31 @@ function fakeLeafValueCB(type: GraphQLLeafType) {
     return getRandomItem(values);
   }
 
-  const faker = stdScalarFakers[type.name];
+  const faker = getFakerByType(stdScalarFakers, type);
   if (faker) return faker();
 
   return `<${type.name}>`;
 }
 
-function getDirectiveArgs(directive, object): DirectiveArgs {
+interface DirectiveArgs {
+  [key: string]: any;
+}
+
+function getDirectiveArgs(
+  directive: GraphQLDirective | null | undefined,
+  object: GraphQLField<any, any> | GraphQLNamedType,
+): DirectiveArgs | undefined {
   assert(directive != null);
 
-  let args = undefined;
+  let args: DirectiveArgs | undefined = undefined;
 
   if (object.astNode != null) {
-    args = getDirectiveValues(directive, object.astNode);
+    args = getDirectiveValues(directive, object.astNode) as DirectiveArgs;
   }
 
+  // @ts-ignore
   if (object.extensionNodes != null) {
+    // @ts-ignore
     for (const node of object.extensionNodes) {
       args = getDirectiveValues(directive, node);
     }
@@ -170,7 +221,9 @@ function getDirectiveArgs(directive, object): DirectiveArgs {
   return args;
 }
 
-function isPlainObject(maybeObject) {
+function isPlainObject(
+  maybeObject: unknown,
+): maybeObject is Record<string, unknown> {
   return (
     typeof maybeObject === 'object' &&
     maybeObject !== null &&
