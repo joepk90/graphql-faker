@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { ValidationErrors } from 'src/utils/fake_definition';
+import { ValidationErrors } from 'src/fakeDefinitions';
 
 // maybe this should be kept in the schema file
 export function prettyPrintValidationErrors(
