@@ -13,11 +13,14 @@ import {
   validate,
   validateSchema,
   ValuesOfCorrectTypeRule,
+  GraphQLObjectType,
 } from 'graphql';
 import { validateSDL } from 'graphql/validation/validate';
 
 import { fakeDefinitionAST } from 'src/fakeDefinitions';
 
+// DefinitionNode
+// @ts-ignore
 function defToName(defNode) {
   const { kind, name } = defNode;
   if (name == null) {
@@ -32,6 +35,7 @@ const fakeDefinitionsSet = new Set(
 
 const schemaWithOnlyFakedDefinitions = buildASTSchema(fakeDefinitionAST);
 // FIXME: mark it as valid to be able to run `validate`
+// @ts-ignore
 schemaWithOnlyFakedDefinitions['__validationErrors'] = [];
 
 // this function might be a duplicate or unneccesary - TODO move to util file
@@ -124,8 +128,10 @@ function extendSchemaWithAST(
 export class ValidationErrors extends Error {
   subErrors: ReadonlyArray<GraphQLError>;
 
-  constructor(errors) {
-    const message = errors.map((error) => error.message).join('\n\n');
+  constructor(errors: ReadonlyArray<GraphQLError>) {
+    const message: string = errors
+      .map((error: GraphQLError) => error.message)
+      .join('\n\n');
     super(message);
 
     this.subErrors = errors;
@@ -139,11 +145,11 @@ export class ValidationErrors extends Error {
   }
 }
 
-function getDefaultRootTypes(schema) {
+function getDefaultRootTypes(schema: GraphQLSchema) {
   return {
-    query: schema.getType('Query'),
-    mutation: schema.getType('Mutation'),
-    subscription: schema.getType('Subscription'),
+    query: schema.getType('Query') as GraphQLObjectType,
+    mutation: schema.getType('Mutation') as GraphQLObjectType,
+    subscription: schema.getType('Subscription') as GraphQLObjectType,
   };
 }
 
