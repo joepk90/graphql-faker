@@ -7,7 +7,7 @@ import {
 import { Options } from 'express-graphql';
 
 import { fakeFieldResolver, fakeTypeResolver } from 'src/fakeDefinitions';
-import { getProxyExecuteFn } from 'src/utils';
+import { getProxyExecuteFn, getCustomHeaders } from 'src/utils';
 
 export type Maybe<T> = T | null | undefined;
 
@@ -73,7 +73,7 @@ export const getGraphqlHTTPOptions = async (
 };
 
 export function getRemoteSchema(url: string): Promise<GraphQLSchema> {
-  return graphqlRequest(url, getIntrospectionQuery())
+  return graphqlRequest(url, getIntrospectionQuery(), getCustomHeaders())
     .then((response) => {
       if (response.errors) {
         throw Error(JSON.stringify(response.errors, null, 2));
